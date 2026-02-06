@@ -108,6 +108,8 @@
 
     input[type="datetime-local"] {
       width: 100%;
+      max-width: 100%;
+      display: block;
     }
 
     button {
@@ -319,6 +321,11 @@
       display: grid;
       gap: 14px;
       overflow: hidden;
+      align-items: stretch;
+    }
+
+    .modal > * {
+      min-width: 0;
     }
 
     .modal h3 {
