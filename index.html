@@ -112,6 +112,12 @@
       display: block;
     }
 
+    @supports (-webkit-touch-callout: none) {
+      input[type="datetime-local"] {
+        max-width: 250px;
+      }
+    }
+
     button {
       border: none;
       padding: 12px 16px;
