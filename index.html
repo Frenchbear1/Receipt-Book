@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Receipt Book</title>
+  <style>
+    :root {
+      --bg: #f1f2f4;
+      --card: #ffffff;
+      --text: #1b1f24;
+      --muted: #6b7280;
+      --accent: #0ea5a4;
+      --accent-2: #ff6b6b;
+      --border: #e3e7ee;
+      --shadow: 0 10px 25px rgba(16, 24, 40, 0.08);
+      --paid: #d8dde6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Space Grotesk", "Trebuchet MS", system-ui, sans-serif;
+      background: radial-gradient(circle at top, #f8f9fb, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: nowrap;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      margin: 0;
+      letter-spacing: 0.5px;
+    }
+
+    .pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .pill.loading {
+      visibility: hidden;
+    }
+
+    .auth-card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .auth-card.loading {
+      display: none;
+    }
+
+    .auth-card form {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    input, button, select {
+      font-family: inherit;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 8px 16px rgba(14, 165, 164, 0.25);
+    }
+
+    .btn-secondary {
+      background: var(--accent-2);
+      color: white;
+      box-shadow: 0 8px 16px rgba(255, 107, 107, 0.25);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      border-radius: 12px;
+      background: #e9edf3;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .card {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .job-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .job-btn {
+      background: #f3f6fb;
+      border: 1px solid var(--border);
+      padding: 14px;
+      border-radius: 14px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .job-btn strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .job-btn span {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .log-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .log-group {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fbfcff;
+    }
+
+    .log-group.paid {
+      background: var(--paid);
+      color: #5f6671;
+    }
+
+
+    .log-group header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.8);
+      width: 100%;
+      user-select: none;
+    }
+
+    .log-group.paid header {
+      background: rgba(216, 221, 230, 0.7);
+    }
+
+    .floating-total {
+      position: sticky;
+      bottom: 16px;
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .log-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .log-item div {
+      font-size: 0.9rem;
+    }
+
+    .date-button {
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-top: 6px;
+      color: var(--muted);
+      font-weight: 500;
+      text-align: left;
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    .muted { color: var(--muted); }
+
+    .hidden { display: none; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: var(--card);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .modal h3 {
+      margin: 0;
+    }
+
+    .modal.small {
+      max-width: 360px;
+    }
+
+    .check-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 60;
+    }
+
+    .check-overlay.show {
+      animation: overlayFade 0.9s ease forwards;
+    }
+
+    .checkmark {
+      width: 88px;
+      height: 88px;
+      filter: drop-shadow(0 12px 26px rgba(34, 197, 94, 0.4));
+      transform: scale(0.6);
+      animation: checkPop 0.9s ease forwards;
+    }
+
+    .checkmark path {
+      fill: none;
+      stroke: #22c55e;
+      stroke-width: 10;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 140;
+      stroke-dashoffset: 140;
+      animation: drawCheck 0.55s ease 0.1s forwards;
+    }
+
+    @keyframes overlayFade {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes checkPop {
+      0% { transform: scale(0.4); }
+      35% { transform: scale(1.08); }
+      65% { transform: scale(0.96); }
+      100% { transform: scale(0.95); }
+    }
+
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.5rem; }
+      .log-item { grid-template-columns: 1fr auto; align-items: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="header-left">
+        <h1>Receipt Book</h1>
+        <div class="muted"></div>
+      </div>
+      <button class="pill loading" id="user-pill" type="button">Not signed in</button>
+    </header>
+
+    <section class="auth-card loading" id="auth-section">
+      <h2>Sign In</h2>
+      <form id="auth-form">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" required />
+        </div>
+        <div>
+          <label for="password">Password</label>
+          <input id="password" type="password" required />
+        </div>
+        <button class="btn-primary" type="submit" id="auth-submit">Sign In</button>
+        <button class="btn-ghost" type="button" id="toggle-auth">Need an account? Create one</button>
+      </form>
+    </section>
+
+    <section id="main-section" class="hidden">
+      <div class="tabs">
+        <div class="tab active" data-tab="jobs">Jobs</div>
+        <div class="tab" data-tab="logs">Log List</div>
+      </div>
+
+      <div id="jobs-tab" class="card">
+        <h2>Job Presets</h2>
+        <form id="job-form">
+          <div style="display:grid; gap:12px; grid-template-columns: 2fr 1fr;">
+            <div>
+              <label for="job-name">Job Name</label>
+              <input id="job-name" required placeholder="Oil change, Lawn mow..." />
+            </div>
+            <div>
+              <label for="job-amount">Amount</label>
+              <input id="job-amount" type="number" min="0" step="0.01" required placeholder="50.00" />
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:12px;">
+            <button class="btn-secondary" type="submit">Add Job Preset</button>
+            <button class="btn-primary" id="one-time-btn" type="button">Quick Log</button>
+          </div>
+        </form>
+        <div class="job-grid" id="job-grid"></div>
+      </div>
+
+      <div id="logs-tab" class="card hidden">
+        <div style="display:flex; justify-content: space-between; align-items:center; gap:12px;">
+          <h2>Log List</h2>
+          <button class="btn-primary" id="mark-paid">Mark Current as Paid</button>
+        </div>
+        <div class="log-list" id="log-list"></div>
+      </div>
+
+      <div class="floating-total">
+        <div class="muted">Total Paid</div>
+        <div id="total-paid" style="font-weight:700; font-size:1.1rem; color:#16a34a;">$0.00</div>
+      </div>
+
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="datetime-modal">
+    <div class="modal">
+      <h3>Edit Log Time</h3>
+      <div>
+        <label for="datetime-input">Date &amp; Time</label>
+        <input id="datetime-input" type="datetime-local" />
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-ghost" id="cancel-datetime" type="button">Cancel</button>
+        <button class="btn-primary" id="save-datetime" type="button">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="delete-modal">
+    <div class="modal small">
+      <h3>Delete Log?</h3>
+      <div class="muted">This can’t be undone.</div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-ghost" id="cancel-delete" type="button">Cancel</button>
+        <button class="btn-secondary" id="confirm-delete" type="button">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="profile-modal">
+    <div class="modal small">
+      <h3>Profile</h3>
+      <div>
+        <label for="display-name">Display Name</label>
+        <input id="display-name" placeholder="Your name" />
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-ghost" id="close-profile" type="button">Close</button>
+        <button class="btn-ghost" id="logout" type="button">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="group-modal">
+    <div class="modal small">
+      <h3>Paid Group</h3>
+      <div class="muted">What do you want to do with this group?</div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-ghost" id="cancel-group" type="button">Cancel</button>
+        <button class="btn-secondary" id="unpay-group" type="button">Unpay</button>
+        <button class="btn-ghost" id="delete-group" type="button">Delete Group</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="check-overlay" id="check-overlay" aria-hidden="true">
+    <svg class="checkmark" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M16 34 L28 46 L48 20" />
+    </svg>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, getDocs, getDoc, query, orderBy, serverTimestamp, writeBatch, where, updateDoc, Timestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDD55bNQhrhILsAExRdptNz9qcBTbrls-g",
+      authDomain: "receipt-book-44ad3.firebaseapp.com",
+      projectId: "receipt-book-44ad3",
+      storageBucket: "receipt-book-44ad3.firebasestorage.app",
+      messagingSenderId: "1094184005997",
+      appId: "1:1094184005997:web:6bf2140e14aa265c6cea64",
+      measurementId: "G-Z4EQMW6JY3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getAnalytics(app);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const authSection = document.getElementById("auth-section");
+    const mainSection = document.getElementById("main-section");
+    const userPill = document.getElementById("user-pill");
+
+    const authForm = document.getElementById("auth-form");
+    const toggleAuthBtn = document.getElementById("toggle-auth");
+    const authSubmit = document.getElementById("auth-submit");
+    let authMode = "signin";
+
+    const jobForm = document.getElementById("job-form");
+    const jobGrid = document.getElementById("job-grid");
+    const logList = document.getElementById("log-list");
+    const markPaidBtn = document.getElementById("mark-paid");
+    const logoutBtn = document.getElementById("logout");
+    const datetimeModal = document.getElementById("datetime-modal");
+    const datetimeInput = document.getElementById("datetime-input");
+    const cancelDatetimeBtn = document.getElementById("cancel-datetime");
+    const saveDatetimeBtn = document.getElementById("save-datetime");
+    let activeLogForEdit = null;
+    const deleteModal = document.getElementById("delete-modal");
+    const cancelDeleteBtn = document.getElementById("cancel-delete");
+    const confirmDeleteBtn = document.getElementById("confirm-delete");
+    let activeLogForDelete = null;
+    const checkOverlay = document.getElementById("check-overlay");
+    const oneTimeBtn = document.getElementById("one-time-btn");
+    const jobNameInput = document.getElementById("job-name");
+    const jobAmountInput = document.getElementById("job-amount");
+    const totalPaidEl = document.getElementById("total-paid");
+    const profileModal = document.getElementById("profile-modal");
+    const displayNameInput = document.getElementById("display-name");
+    const closeProfileBtn = document.getElementById("close-profile");
+    const groupModal = document.getElementById("group-modal");
+    const cancelGroupBtn = document.getElementById("cancel-group");
+    const unpayGroupBtn = document.getElementById("unpay-group");
+    const deleteGroupBtn = document.getElementById("delete-group");
+    let activeGroupForAction = null;
+
+    const tabs = document.querySelectorAll(".tab");
+    const jobsTab = document.getElementById("jobs-tab");
+    const logsTab = document.getElementById("logs-tab");
+
+    const formatMoney = (value) => new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD"
+    }).format(value || 0);
+
+    const formatDate = (date) => new Intl.DateTimeFormat("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    }).format(date);
+
+    const toLocalInputValue = (date) => {
+      const pad = (num) => String(num).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    };
+
+    const setAuthMode = () => {
+      if (authMode === "signin") {
+        authSubmit.textContent = "Sign In";
+        toggleAuthBtn.textContent = "Need an account? Create one";
+        document.querySelector(".auth-card h2").textContent = "Sign In";
+      } else {
+        authSubmit.textContent = "Create Account";
+        toggleAuthBtn.textContent = "Have an account? Sign in";
+        document.querySelector(".auth-card h2").textContent = "Create Account";
+      }
+    };
+
+    toggleAuthBtn.addEventListener("click", () => {
+      authMode = authMode === "signin" ? "signup" : "signin";
+      setAuthMode();
+    });
+
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      try {
+        if (authMode === "signin") {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+        }
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    const jobsCollection = (uid) => collection(db, "users", uid, "jobs");
+    const logsCollection = (uid) => collection(db, "users", uid, "logs");
+    const groupsCollection = (uid) => collection(db, "users", uid, "groups");
+    const profileDoc = (uid) => doc(db, "users", uid);
+    const lastUidKey = "receipt-book:last-uid";
+    const profileCacheKey = (uid) => cacheKey(uid, "profile");
+
+    const cacheKey = (uid, key) => `receipt-book:${uid}:${key}`;
+    const loadCache = (uid, key) => {
+      try {
+        const raw = localStorage.getItem(cacheKey(uid, key));
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    };
+    const saveCache = (uid, key, data) => {
+      try {
+        localStorage.setItem(cacheKey(uid, key), JSON.stringify(data));
+      } catch {
+        // ignore cache failures
+      }
+    };
+
+    const normalizeDate = (value) => {
+      if (!value) return new Date();
+      if (typeof value === "number") return new Date(value);
+      if (value.toDate) return value.toDate();
+      return new Date(value);
+    };
+
+    const renderJobs = (jobs) => {
+      jobGrid.innerHTML = "";
+      jobs.forEach((job) => {
+        const button = document.createElement("button");
+        button.className = "job-btn";
+        button.innerHTML = `<strong>${job.name}</strong><span>${formatMoney(job.amount)}</span>`;
+        button.addEventListener("click", () => addLog(auth.currentUser.uid, job.id, job));
+        jobGrid.appendChild(button);
+      });
+    };
+
+    const renderLogs = (logs, groups) => {
+      logList.innerHTML = "";
+      const groupMap = {};
+      (groups || []).forEach((g) => { groupMap[g.id] = g; });
+
+      const grouped = { unpaid: [] };
+      (logs || []).forEach((log) => {
+        const key = log.groupId || "unpaid";
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(log);
+      });
+
+      const renderGroup = (title, groupLogs, paid = false, showTotal = false, groupKey = "unpaid", subtitle = "") => {
+        const groupEl = document.createElement("div");
+        groupEl.className = `log-group ${paid ? "paid" : ""}`;
+        groupEl.dataset.groupKey = groupKey;
+        const header = document.createElement("header");
+        header.oncontextmenu = () => false;
+        const total = groupLogs.reduce((sum, log) => sum + (Number(log.amount) || 0), 0);
+        const rightText = showTotal ? `${groupLogs.length} items · ${formatMoney(total)}` : `${groupLogs.length} items`;
+        header.innerHTML = `
+          <div>
+            <strong>${title}</strong>
+            ${subtitle ? `<div class="muted">${subtitle}</div>` : ""}
+          </div>
+          <div class="muted">${rightText}</div>
+        `;
+        groupEl.appendChild(header);
+
+        groupLogs.forEach((log) => {
+          const row = document.createElement("div");
+          row.className = "log-item";
+          row.dataset.logId = log.id;
+          const createdAt = normalizeDate(log.createdAt);
+          row.innerHTML = `
+            <div>
+              <strong>${log.jobName}</strong>
+              <button class="date-button" data-log-id="${log.id}">${formatDate(createdAt)}</button>
+            </div>
+            <div><strong>${formatMoney(log.amount)}</strong></div>
+          `;
+          row.oncontextmenu = () => false;
+          groupEl.appendChild(row);
+        });
+        logList.appendChild(groupEl);
+      };
+
+      if (grouped.unpaid && grouped.unpaid.length) {
+        renderGroup("Current (Unpaid)", grouped.unpaid, false, true, "unpaid");
+      }
+
+      Object.keys(grouped)
+        .filter((key) => key !== "unpaid")
+        .forEach((groupId) => {
+          const group = groupMap[groupId];
+          const paidDate = group ? formatDate(normalizeDate(group.createdAt)) : "";
+          renderGroup("Paid", grouped[groupId], true, true, groupId, paidDate);
+        });
+
+      const paidTotal = (logs || []).reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0);
+      totalPaidEl.textContent = formatMoney(paidTotal);
+    };
+
+    const loadJobs = async (uid) => {
+      const snapshot = await getDocs(query(jobsCollection(uid), orderBy("createdAt", "desc")));
+      const jobs = [];
+      snapshot.forEach((docSnap) => {
+        const job = docSnap.data();
+        jobs.push({
+          id: docSnap.id,
+          ...job,
+          createdAt: job.createdAt?.toMillis ? job.createdAt.toMillis() : Date.now()
+        });
+      });
+      saveCache(uid, "jobs", jobs);
+      renderJobs(jobs);
+    };
+
+    const loadLogs = async (uid) => {
+      const logsSnap = await getDocs(query(logsCollection(uid), orderBy("createdAt", "desc")));
+      const groupsSnap = await getDocs(query(groupsCollection(uid), orderBy("createdAt", "desc")));
+      const logs = [];
+      const groups = [];
+
+      logsSnap.forEach((logDoc) => {
+        const log = logDoc.data();
+        logs.push({
+          id: logDoc.id,
+          ...log,
+          createdAt: log.createdAt?.toMillis ? log.createdAt.toMillis() : Date.now()
+        });
+      });
+      groupsSnap.forEach((g) => {
+        const data = g.data();
+        groups.push({
+          id: g.id,
+          ...data,
+          createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : Date.now()
+        });
+      });
+
+      saveCache(uid, "logs", logs);
+      saveCache(uid, "groups", groups);
+      renderLogs(logs, groups);
+    };
+
+    const addLog = async (uid, jobId, job) => {
+      showCheck();
+      const cacheLogs = loadCache(uid, "logs") || [];
+      cacheLogs.unshift({
+        id: `local-${Date.now()}`,
+        jobId,
+        jobName: job.name,
+        amount: job.amount,
+        createdAt: Date.now(),
+        paid: false,
+        groupId: null
+      });
+      saveCache(uid, "logs", cacheLogs);
+      renderLogs(cacheLogs, loadCache(uid, "groups") || []);
+      totalPaidEl.textContent = formatMoney(
+        cacheLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+      );
+      await addDoc(logsCollection(uid), {
+        jobId,
+        jobName: job.name,
+        amount: job.amount,
+        createdAt: serverTimestamp(),
+        paid: false,
+        groupId: null
+      });
+      await loadLogs(uid);
+    };
+
+    const addOneTimeLog = async (uid, name, amount) => {
+      showCheck();
+      const cacheLogs = loadCache(uid, "logs") || [];
+      cacheLogs.unshift({
+        id: `local-${Date.now()}`,
+        jobId: null,
+        jobName: name,
+        amount,
+        createdAt: Date.now(),
+        paid: false,
+        groupId: null
+      });
+      saveCache(uid, "logs", cacheLogs);
+      renderLogs(cacheLogs, loadCache(uid, "groups") || []);
+      totalPaidEl.textContent = formatMoney(
+        cacheLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+      );
+      await addDoc(logsCollection(uid), {
+        jobId: null,
+        jobName: name,
+        amount,
+        createdAt: serverTimestamp(),
+        paid: false,
+        groupId: null
+      });
+      await loadLogs(uid);
+    };
+
+    const showCheck = () => {
+      checkOverlay.classList.remove("show");
+      void checkOverlay.offsetWidth;
+      checkOverlay.classList.add("show");
+    };
+
+    jobForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("job-name").value.trim();
+      const amount = parseFloat(document.getElementById("job-amount").value);
+      const user = auth.currentUser;
+      if (!user) return;
+      if (!name || Number.isNaN(amount)) return;
+
+      await addDoc(jobsCollection(user.uid), {
+        name,
+        amount,
+        createdAt: serverTimestamp()
+      });
+
+      jobForm.reset();
+      await loadJobs(user.uid);
+    });
+
+    markPaidBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        const unpaidSnap = await getDocs(query(logsCollection(user.uid), where("paid", "==", false)));
+        if (unpaidSnap.empty) {
+          alert("No unpaid logs to mark as paid.");
+          return;
+        }
+
+        const unpaidGroup = logList.querySelector('.log-group[data-group-key="unpaid"]');
+        if (unpaidGroup) {
+          unpaidGroup.classList.add("paid");
+        }
+
+        const groupRef = doc(groupsCollection(user.uid));
+        const batch = writeBatch(db);
+        batch.set(groupRef, { createdAt: serverTimestamp() });
+
+        unpaidSnap.forEach((docSnap) => {
+          batch.set(doc(logsCollection(user.uid), docSnap.id), {
+            ...docSnap.data(),
+            paid: true,
+            groupId: groupRef.id
+          }, { merge: true });
+        });
+
+        await batch.commit();
+
+        if (unpaidGroup) {
+          const header = unpaidGroup.querySelector("header");
+          if (header) {
+            const now = new Date();
+            const count = unpaidGroup.querySelectorAll(".log-item").length;
+            const total = Array.from(unpaidGroup.querySelectorAll(".log-item strong:last-child")).reduce((sum, el) => {
+              const value = Number(el.textContent.replace(/[^0-9.-]+/g, ""));
+              return sum + (Number.isNaN(value) ? 0 : value);
+            }, 0);
+            header.innerHTML = `
+              <div>
+                <strong>Paid</strong>
+                <div class="muted">${formatDate(now)}</div>
+              </div>
+              <div class="muted">${count} items · ${formatMoney(total)}</div>
+            `;
+          }
+          unpaidGroup.dataset.groupKey = groupRef.id;
+          logList.prepend(unpaidGroup);
+        } else {
+          await loadLogs(user.uid);
+        }
+
+        const cacheLogs = loadCache(user.uid, "logs") || [];
+        const updatedLogs = cacheLogs.map((log) => {
+          if (!log.paid) {
+            return { ...log, paid: true, groupId: groupRef.id };
+          }
+          return log;
+        });
+        const cacheGroups = loadCache(user.uid, "groups") || [];
+        cacheGroups.unshift({ id: groupRef.id, createdAt: Date.now() });
+        saveCache(user.uid, "logs", updatedLogs);
+        saveCache(user.uid, "groups", cacheGroups);
+        totalPaidEl.textContent = formatMoney(
+          updatedLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+        );
+      } catch (err) {
+        console.error(err);
+        alert(err.message || "Could not mark as paid. Check Firestore indexes.");
+      }
+    });
+
+    oneTimeBtn.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const name = jobNameInput.value.trim();
+      const amount = parseFloat(jobAmountInput.value);
+      if (!name || Number.isNaN(amount)) return;
+      await addOneTimeLog(user.uid, name, amount);
+      jobNameInput.value = "";
+      jobAmountInput.value = "";
+    });
+
+    logList.addEventListener("click", (e) => {
+      const button = e.target.closest("button[data-log-id]");
+      if (!button) return;
+      const logId = button.dataset.logId;
+      const displayText = button.textContent;
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const logDoc = Array.from(logList.querySelectorAll("button[data-log-id]")).find((el) => el.dataset.logId === logId);
+      if (!logDoc) return;
+
+      activeLogForEdit = { uid: user.uid, logId };
+      const fallbackDate = new Date();
+      const currentDate = displayText ? new Date(displayText) : fallbackDate;
+      datetimeInput.value = toLocalInputValue(isNaN(currentDate) ? fallbackDate : currentDate);
+      datetimeModal.classList.add("show");
+    });
+
+    cancelDatetimeBtn.addEventListener("click", () => {
+      activeLogForEdit = null;
+      datetimeModal.classList.remove("show");
+    });
+
+    datetimeModal.addEventListener("click", (e) => {
+      if (e.target === datetimeModal) {
+        activeLogForEdit = null;
+        datetimeModal.classList.remove("show");
+      }
+    });
+
+    saveDatetimeBtn.addEventListener("click", async () => {
+      if (!activeLogForEdit) return;
+      const { uid, logId } = activeLogForEdit;
+      const value = datetimeInput.value;
+      if (!value) return;
+      const date = new Date(value);
+      await updateDoc(doc(logsCollection(uid), logId), {
+        createdAt: Timestamp.fromDate(date)
+      });
+      activeLogForEdit = null;
+      datetimeModal.classList.remove("show");
+      await loadLogs(uid);
+    });
+
+    let pressTimer = null;
+    const pressDelay = 550;
+
+    logList.addEventListener("pointerdown", (e) => {
+      const item = e.target.closest(".log-item");
+      if (!item) return;
+      if (e.target.closest("button")) return;
+      const logId = item.dataset.logId;
+      if (!logId) return;
+      const user = auth.currentUser;
+      if (!user) return;
+      e.preventDefault();
+      pressTimer = setTimeout(() => {
+        activeLogForDelete = { uid: user.uid, logId };
+        deleteModal.classList.add("show");
+      }, pressDelay);
+    });
+
+    const clearPress = () => {
+      if (pressTimer) {
+        clearTimeout(pressTimer);
+        pressTimer = null;
+      }
+    };
+
+    logList.addEventListener("pointerup", clearPress);
+    logList.addEventListener("pointerleave", clearPress);
+    logList.addEventListener("pointercancel", clearPress);
+    logList.addEventListener("pointermove", clearPress);
+    logList.addEventListener("contextmenu", (e) => {
+      const item = e.target.closest(".log-item");
+      const header = e.target.closest(".log-group.paid header");
+      if (item || header) e.preventDefault();
+    });
+
+    document.addEventListener("contextmenu", (e) => {
+      if (e.target.closest(".log-item, .log-group.paid header")) {
+        e.preventDefault();
+      }
+    }, true);
+
+    let groupPressTimer = null;
+    const clearGroupPress = () => {
+      if (groupPressTimer) {
+        clearTimeout(groupPressTimer);
+        groupPressTimer = null;
+      }
+    };
+
+    logList.addEventListener("pointerdown", (e) => {
+      const header = e.target.closest(".log-group.paid header");
+      if (!header) return;
+      const groupEl = header.closest(".log-group.paid");
+      if (!groupEl) return;
+      const groupId = groupEl.dataset.groupKey;
+      if (!groupId || groupId === "unpaid") return;
+      const user = auth.currentUser;
+      if (!user) return;
+      e.preventDefault();
+      groupPressTimer = setTimeout(() => {
+        activeGroupForAction = { uid: user.uid, groupId };
+        groupModal.classList.add("show");
+      }, pressDelay);
+    });
+
+    logList.addEventListener("pointerup", clearGroupPress);
+    logList.addEventListener("pointerleave", clearGroupPress);
+    logList.addEventListener("pointercancel", clearGroupPress);
+    logList.addEventListener("pointermove", clearGroupPress);
+
+    cancelGroupBtn.addEventListener("click", () => {
+      activeGroupForAction = null;
+      groupModal.classList.remove("show");
+    });
+
+    groupModal.addEventListener("click", (e) => {
+      if (e.target === groupModal) {
+        activeGroupForAction = null;
+        groupModal.classList.remove("show");
+      }
+    });
+
+    unpayGroupBtn.addEventListener("click", async () => {
+      if (!activeGroupForAction) return;
+      const { uid, groupId } = activeGroupForAction;
+      const groupEl = logList.querySelector(`.log-group[data-group-key="${groupId}"]`);
+      activeGroupForAction = null;
+      groupModal.classList.remove("show");
+
+      const cacheLogs = loadCache(uid, "logs") || [];
+      const updatedLogs = cacheLogs.map((log) => {
+        if (log.groupId === groupId) {
+          return { ...log, paid: false, groupId: null };
+        }
+        return log;
+      });
+      const cacheGroups = loadCache(uid, "groups") || [];
+      saveCache(uid, "logs", updatedLogs);
+      saveCache(uid, "groups", cacheGroups.filter((g) => g.id !== groupId));
+      totalPaidEl.textContent = formatMoney(
+        updatedLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+      );
+
+      if (groupEl) {
+        groupEl.classList.remove("paid");
+        groupEl.dataset.groupKey = "unpaid";
+        const header = groupEl.querySelector("header");
+        if (header) {
+          const total = Array.from(groupEl.querySelectorAll(".log-item strong:last-child")).reduce((sum, el) => {
+            const value = Number(el.textContent.replace(/[^0-9.-]+/g, ""));
+            return sum + (Number.isNaN(value) ? 0 : value);
+          }, 0);
+          const count = groupEl.querySelectorAll(".log-item").length;
+          header.innerHTML = `<div><strong>Current (Unpaid)</strong></div><div class="muted">${count} items · ${formatMoney(total)}</div>`;
+        }
+        logList.prepend(groupEl);
+      }
+
+      (async () => {
+        try {
+          const logsSnap = await getDocs(query(logsCollection(uid), where("groupId", "==", groupId)));
+          const batch = writeBatch(db);
+          logsSnap.forEach((docSnap) => {
+            batch.set(doc(logsCollection(uid), docSnap.id), { paid: false, groupId: null }, { merge: true });
+          });
+          batch.delete(doc(groupsCollection(uid), groupId));
+          await batch.commit();
+        } catch (err) {
+          console.error(err);
+          await loadLogs(uid);
+        }
+      })();
+    });
+
+    deleteGroupBtn.addEventListener("click", async () => {
+      if (!activeGroupForAction) return;
+      const { uid, groupId } = activeGroupForAction;
+      const groupEl = logList.querySelector(`.log-group[data-group-key="${groupId}"]`);
+      activeGroupForAction = null;
+      groupModal.classList.remove("show");
+
+      const cacheLogs = loadCache(uid, "logs") || [];
+      const cacheGroups = loadCache(uid, "groups") || [];
+      saveCache(uid, "logs", cacheLogs.filter((log) => log.groupId !== groupId));
+      saveCache(uid, "groups", cacheGroups.filter((g) => g.id !== groupId));
+      const remainingLogs = loadCache(uid, "logs") || [];
+      totalPaidEl.textContent = formatMoney(
+        remainingLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+      );
+
+      if (groupEl) groupEl.remove();
+
+      (async () => {
+        try {
+          const logsSnap = await getDocs(query(logsCollection(uid), where("groupId", "==", groupId)));
+          const batch = writeBatch(db);
+          logsSnap.forEach((docSnap) => {
+            batch.delete(doc(logsCollection(uid), docSnap.id));
+          });
+          batch.delete(doc(groupsCollection(uid), groupId));
+          await batch.commit();
+        } catch (err) {
+          console.error(err);
+          await loadLogs(uid);
+        }
+      })();
+    });
+
+    cancelDeleteBtn.addEventListener("click", () => {
+      activeLogForDelete = null;
+      deleteModal.classList.remove("show");
+    });
+
+    deleteModal.addEventListener("click", (e) => {
+      if (e.target === deleteModal) {
+        activeLogForDelete = null;
+        deleteModal.classList.remove("show");
+      }
+    });
+
+    confirmDeleteBtn.addEventListener("click", async () => {
+      if (!activeLogForDelete) return;
+      const { uid, logId } = activeLogForDelete;
+      const row = logList.querySelector(`.log-item[data-log-id="${logId}"]`);
+      if (row) {
+        const group = row.closest(".log-group");
+        row.remove();
+        if (group && group.querySelectorAll(".log-item").length === 0) {
+          group.remove();
+        }
+        const cacheLogs = loadCache(uid, "logs") || [];
+        saveCache(uid, "logs", cacheLogs.filter((l) => l.id !== logId));
+        const remainingLogs = loadCache(uid, "logs") || [];
+        totalPaidEl.textContent = formatMoney(
+          remainingLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+        );
+      } else {
+        await loadLogs(uid);
+      }
+      activeLogForDelete = null;
+      deleteModal.classList.remove("show");
+
+      (async () => {
+        try {
+          await deleteDoc(doc(logsCollection(uid), logId));
+        } catch (err) {
+          console.error(err);
+          await loadLogs(uid);
+        }
+      })();
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    userPill.addEventListener("click", async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const snap = await getDoc(profileDoc(user.uid));
+      const data = snap.exists() ? snap.data() : {};
+      displayNameInput.value = data.displayName || "";
+      profileModal.classList.add("show");
+    });
+
+    closeProfileBtn.addEventListener("click", () => {
+      profileModal.classList.remove("show");
+    });
+
+    profileModal.addEventListener("click", (e) => {
+      if (e.target === profileModal) profileModal.classList.remove("show");
+    });
+
+    const saveProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      const name = displayNameInput.value.trim();
+      await setDoc(profileDoc(user.uid), { displayName: name }, { merge: true });
+      userPill.textContent = name || user.email;
+      try {
+        localStorage.setItem(profileCacheKey(user.uid), JSON.stringify({ displayName: name }));
+      } catch {}
+    };
+
+    displayNameInput.addEventListener("blur", () => {
+      saveProfile();
+    });
+
+    displayNameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        saveProfile();
+        profileModal.classList.remove("show");
+      }
+    });
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        if (tab.dataset.tab === "jobs") {
+          jobsTab.classList.remove("hidden");
+          logsTab.classList.add("hidden");
+        } else {
+          logsTab.classList.remove("hidden");
+          jobsTab.classList.add("hidden");
+        }
+      });
+    });
+
+    const hydrateFromCache = () => {
+      const cachedUid = localStorage.getItem(lastUidKey);
+      if (!cachedUid) return false;
+      const cachedProfileRaw = localStorage.getItem(profileCacheKey(cachedUid));
+      if (cachedProfileRaw) {
+        try {
+          const profile = JSON.parse(cachedProfileRaw);
+          if (profile.displayName) userPill.textContent = profile.displayName;
+        } catch {}
+      }
+      const cachedJobs = loadCache(cachedUid, "jobs");
+      const cachedLogs = loadCache(cachedUid, "logs");
+      const cachedGroups = loadCache(cachedUid, "groups");
+      if (cachedJobs) renderJobs(cachedJobs);
+      if (cachedLogs) renderLogs(cachedLogs, cachedGroups || []);
+      authSection.classList.add("hidden");
+      mainSection.classList.remove("hidden");
+      userPill.classList.remove("loading");
+      authSection.classList.remove("loading");
+      return true;
+    };
+
+    hydrateFromCache();
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        localStorage.setItem(lastUidKey, user.uid);
+        const snap = await getDoc(profileDoc(user.uid));
+        const data = snap.exists() ? snap.data() : {};
+        userPill.textContent = data.displayName || user.email;
+        try {
+          localStorage.setItem(profileCacheKey(user.uid), JSON.stringify({ displayName: data.displayName || "" }));
+        } catch {}
+        authSection.classList.add("hidden");
+        mainSection.classList.remove("hidden");
+        const cachedJobs = loadCache(user.uid, "jobs");
+        const cachedLogs = loadCache(user.uid, "logs");
+        const cachedGroups = loadCache(user.uid, "groups");
+        if (cachedJobs) renderJobs(cachedJobs);
+        if (cachedLogs) renderLogs(cachedLogs, cachedGroups || []);
+        loadJobs(user.uid);
+        loadLogs(user.uid);
+      } else {
+        userPill.textContent = "Not signed in";
+        authSection.classList.remove("hidden");
+        mainSection.classList.add("hidden");
+      }
+      userPill.classList.remove("loading");
+      authSection.classList.remove("loading");
+    });
+  </script>
+</body>
+</html>
