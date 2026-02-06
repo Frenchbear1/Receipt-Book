@@ -103,6 +103,11 @@
       border: 1px solid var(--border);
       background: #f9fafb;
       font-size: 16px;
+      min-width: 0;
+    }
+
+    input[type="datetime-local"] {
+      width: 100%;
     }
 
     button {
@@ -132,6 +137,11 @@
       background: transparent;
       color: var(--muted);
       border: 1px solid var(--border);
+    }
+
+    .btn-ghost.danger {
+      border-color: #ef4444;
+      color: #b91c1c;
     }
 
     .tabs {
@@ -178,6 +188,9 @@
       border-radius: 14px;
       text-align: left;
       cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
 
     .job-btn strong {
@@ -305,6 +318,7 @@
       padding: 18px;
       display: grid;
       gap: 14px;
+      overflow: hidden;
     }
 
     .modal h3 {
@@ -468,6 +482,25 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="job-delete-modal">
+    <div class="modal small">
+      <h3>Edit Job Preset</h3>
+      <div>
+        <label for="job-rename-input">Preset Name</label>
+        <input id="job-rename-input" placeholder="Job name" />
+      </div>
+      <div class="muted hidden" id="job-rename-hint">Save name for preset only, or update all past logs from this preset.</div>
+      <div class="hidden" id="job-rename-actions" style="display:none; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn-secondary" id="save-job-only" type="button">Save Preset</button>
+        <button class="btn-primary" id="save-job-all" type="button">Save + Update Logs</button>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn-ghost" id="cancel-job-delete" type="button">Cancel</button>
+        <button class="btn-ghost danger" id="confirm-job-delete" type="button">Delete Preset</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-backdrop" id="profile-modal">
     <div class="modal small">
       <h3>Profile</h3>
@@ -549,6 +582,18 @@
     const jobNameInput = document.getElementById("job-name");
     const jobAmountInput = document.getElementById("job-amount");
     const totalPaidEl = document.getElementById("total-paid");
+    const jobDeleteModal = document.getElementById("job-delete-modal");
+    const cancelJobDeleteBtn = document.getElementById("cancel-job-delete");
+    const confirmJobDeleteBtn = document.getElementById("confirm-job-delete");
+    const saveJobOnlyBtn = document.getElementById("save-job-only");
+    const saveJobAllBtn = document.getElementById("save-job-all");
+    const jobRenameInput = document.getElementById("job-rename-input");
+    const jobRenameHint = document.getElementById("job-rename-hint");
+    const jobRenameActions = document.getElementById("job-rename-actions");
+    let activeJobForDelete = null;
+
+    jobRenameHint.classList.add("hidden");
+    jobRenameActions.classList.add("hidden");
     const profileModal = document.getElementById("profile-modal");
     const displayNameInput = document.getElementById("display-name");
     const closeProfileBtn = document.getElementById("close-profile");
@@ -640,13 +685,31 @@
       return new Date(value);
     };
 
-    const renderJobs = (jobs) => {
+    const computeUsageMap = (logs) => {
+      const map = {};
+      (logs || []).forEach((log) => {
+        if (log.jobId) {
+          map[log.jobId] = (map[log.jobId] || 0) + 1;
+        }
+      });
+      return map;
+    };
+
+    const renderJobs = (jobs, usageMap = null) => {
       jobGrid.innerHTML = "";
-      jobs.forEach((job) => {
+      const sorted = [...jobs].sort((a, b) => {
+        const ua = usageMap ? (usageMap[a.id] || 0) : (Number(a.usageCount) || 0);
+        const ub = usageMap ? (usageMap[b.id] || 0) : (Number(b.usageCount) || 0);
+        if (ub !== ua) return ub - ua;
+        return (b.createdAt || 0) - (a.createdAt || 0);
+      });
+      sorted.forEach((job) => {
         const button = document.createElement("button");
         button.className = "job-btn";
+        button.dataset.jobId = job.id;
         button.innerHTML = `<strong>${job.name}</strong><span>${formatMoney(job.amount)}</span>`;
         button.addEventListener("click", () => addLog(auth.currentUser.uid, job.id, job));
+        button.oncontextmenu = () => false;
         jobGrid.appendChild(button);
       });
     };
@@ -656,8 +719,20 @@
       const groupMap = {};
       (groups || []).forEach((g) => { groupMap[g.id] = g; });
 
+      const usageMap = computeUsageMap(logs);
+      const cachedJobs = loadCache(auth.currentUser?.uid || "", "jobs");
+      if (cachedJobs && auth.currentUser) {
+        const updatedJobs = cachedJobs.map((job) => ({
+          ...job,
+          usageCount: usageMap[job.id] || 0
+        }));
+        saveCache(auth.currentUser.uid, "jobs", updatedJobs);
+        renderJobs(updatedJobs, usageMap);
+      }
+
       const grouped = { unpaid: [] };
-      (logs || []).forEach((log) => {
+      const sortedLogs = [...(logs || [])].sort((a, b) => normalizeDate(b.createdAt) - normalizeDate(a.createdAt));
+      sortedLogs.forEach((log) => {
         const key = log.groupId || "unpaid";
         if (!grouped[key]) grouped[key] = [];
         grouped[key].push(log);
@@ -704,6 +779,11 @@
 
       Object.keys(grouped)
         .filter((key) => key !== "unpaid")
+        .sort((a, b) => {
+          const ga = groupMap[a]?.createdAt ? normalizeDate(groupMap[a].createdAt) : new Date(0);
+          const gb = groupMap[b]?.createdAt ? normalizeDate(groupMap[b].createdAt) : new Date(0);
+          return gb - ga;
+        })
         .forEach((groupId) => {
           const group = groupMap[groupId];
           const paidDate = group ? formatDate(normalizeDate(group.createdAt)) : "";
@@ -726,7 +806,8 @@
         });
       });
       saveCache(uid, "jobs", jobs);
-      renderJobs(jobs);
+      const usageMap = computeUsageMap(loadCache(uid, "logs") || []);
+      renderJobs(jobs, usageMap);
     };
 
     const loadLogs = async (uid) => {
@@ -774,6 +855,19 @@
       totalPaidEl.textContent = formatMoney(
         cacheLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
       );
+      let newUsage = null;
+      if (jobId) {
+        const cacheJobs = loadCache(uid, "jobs") || [];
+        const updatedJobs = cacheJobs.map((j) => {
+          if (j.id === jobId) {
+            newUsage = (Number(j.usageCount) || 0) + 1;
+            return { ...j, usageCount: newUsage };
+          }
+          return j;
+        });
+        saveCache(uid, "jobs", updatedJobs);
+        renderJobs(updatedJobs, computeUsageMap(loadCache(uid, "logs") || []));
+      }
       await addDoc(logsCollection(uid), {
         jobId,
         jobName: job.name,
@@ -782,6 +876,15 @@
         paid: false,
         groupId: null
       });
+      if (jobId && newUsage !== null) {
+        try {
+          await updateDoc(doc(jobsCollection(uid), jobId), {
+            usageCount: newUsage
+          });
+        } catch {
+          // ignore; cache already updated
+        }
+      }
       await loadLogs(uid);
     };
 
@@ -830,7 +933,8 @@
       await addDoc(jobsCollection(user.uid), {
         name,
         amount,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        usageCount: 0
       });
 
       jobForm.reset();
@@ -1004,6 +1108,138 @@
         e.preventDefault();
       }
     }, true);
+
+    jobGrid.addEventListener("contextmenu", (e) => {
+      if (e.target.closest(".job-btn")) e.preventDefault();
+    });
+
+    let jobPressTimer = null;
+    const clearJobPress = () => {
+      if (jobPressTimer) {
+        clearTimeout(jobPressTimer);
+        jobPressTimer = null;
+      }
+    };
+
+    jobGrid.addEventListener("pointerdown", (e) => {
+      const button = e.target.closest(".job-btn");
+      if (!button) return;
+      const user = auth.currentUser;
+      if (!user) return;
+      e.preventDefault();
+      jobPressTimer = setTimeout(() => {
+        const cacheJobs = loadCache(user.uid, "jobs") || [];
+        const job = cacheJobs.find((j) => j.id === button.dataset.jobId);
+        jobRenameInput.value = job?.name || "";
+    jobRenameInput.dataset.original = job?.name || "";
+    jobRenameHint.classList.add("hidden");
+    jobRenameActions.classList.add("hidden");
+    jobRenameActions.style.display = "none";
+    activeJobForDelete = { uid: user.uid, jobId: button.dataset.jobId };
+    jobDeleteModal.classList.add("show");
+      }, pressDelay);
+    }, true);
+
+    jobGrid.addEventListener("pointerup", clearJobPress);
+    jobGrid.addEventListener("pointerleave", clearJobPress);
+    jobGrid.addEventListener("pointercancel", clearJobPress);
+    jobGrid.addEventListener("pointermove", clearJobPress);
+
+    cancelJobDeleteBtn.addEventListener("click", () => {
+      activeJobForDelete = null;
+      jobDeleteModal.classList.remove("show");
+    });
+
+    jobDeleteModal.addEventListener("click", (e) => {
+      if (e.target === jobDeleteModal) {
+        activeJobForDelete = null;
+        jobDeleteModal.classList.remove("show");
+      }
+    });
+
+    jobRenameInput.addEventListener("input", () => {
+      const original = jobRenameInput.dataset.original || "";
+      const current = jobRenameInput.value.trim();
+      const changed = current && current !== original;
+      if (changed) {
+        jobRenameHint.classList.remove("hidden");
+        jobRenameActions.classList.remove("hidden");
+        jobRenameActions.style.display = "flex";
+      } else {
+        jobRenameHint.classList.add("hidden");
+        jobRenameActions.classList.add("hidden");
+        jobRenameActions.style.display = "none";
+      }
+    });
+
+    const renameJob = async (applyToLogs) => {
+      if (!activeJobForDelete) return;
+      const { uid, jobId } = activeJobForDelete;
+      const newName = jobRenameInput.value.trim();
+      if (!newName) return;
+      activeJobForDelete = null;
+      jobDeleteModal.classList.remove("show");
+
+      const cacheJobs = loadCache(uid, "jobs") || [];
+      const updatedJobs = cacheJobs.map((job) => {
+        if (job.id === jobId) return { ...job, name: newName };
+        return job;
+      });
+      saveCache(uid, "jobs", updatedJobs);
+      renderJobs(updatedJobs, computeUsageMap(loadCache(uid, "logs") || []));
+
+      if (applyToLogs) {
+        const cacheLogs = loadCache(uid, "logs") || [];
+        const updatedLogs = cacheLogs.map((log) => {
+          if (log.jobId === jobId) return { ...log, jobName: newName };
+          return log;
+        });
+        saveCache(uid, "logs", updatedLogs);
+        renderLogs(updatedLogs, loadCache(uid, "groups") || []);
+      }
+
+      (async () => {
+        try {
+          await updateDoc(doc(jobsCollection(uid), jobId), { name: newName });
+          if (applyToLogs) {
+            const logsSnap = await getDocs(query(logsCollection(uid), where("jobId", "==", jobId)));
+            const batch = writeBatch(db);
+            logsSnap.forEach((docSnap) => {
+              batch.set(doc(logsCollection(uid), docSnap.id), { jobName: newName }, { merge: true });
+            });
+            await batch.commit();
+          }
+        } catch (err) {
+          console.error(err);
+          await loadJobs(uid);
+          if (applyToLogs) await loadLogs(uid);
+        }
+      })();
+    };
+
+    saveJobOnlyBtn.addEventListener("click", () => renameJob(false));
+    saveJobAllBtn.addEventListener("click", () => renameJob(true));
+
+    confirmJobDeleteBtn.addEventListener("click", () => {
+      if (!activeJobForDelete) return;
+      const { uid, jobId } = activeJobForDelete;
+      activeJobForDelete = null;
+      jobDeleteModal.classList.remove("show");
+
+      const cacheJobs = loadCache(uid, "jobs") || [];
+      const updatedJobs = cacheJobs.filter((job) => job.id !== jobId);
+      saveCache(uid, "jobs", updatedJobs);
+      renderJobs(updatedJobs, computeUsageMap(loadCache(uid, "logs") || []));
+
+      (async () => {
+        try {
+          await deleteDoc(doc(jobsCollection(uid), jobId));
+        } catch (err) {
+          console.error(err);
+          await loadJobs(uid);
+        }
+      })();
+    });
 
     let groupPressTimer = null;
     const clearGroupPress = () => {
@@ -1247,7 +1483,10 @@
       const cachedJobs = loadCache(cachedUid, "jobs");
       const cachedLogs = loadCache(cachedUid, "logs");
       const cachedGroups = loadCache(cachedUid, "groups");
-      if (cachedJobs) renderJobs(cachedJobs);
+      if (cachedJobs) {
+        const usageMap = computeUsageMap(cachedLogs || []);
+        renderJobs(cachedJobs, usageMap);
+      }
       if (cachedLogs) renderLogs(cachedLogs, cachedGroups || []);
       authSection.classList.add("hidden");
       mainSection.classList.remove("hidden");
@@ -1269,11 +1508,14 @@
         } catch {}
         authSection.classList.add("hidden");
         mainSection.classList.remove("hidden");
-        const cachedJobs = loadCache(user.uid, "jobs");
-        const cachedLogs = loadCache(user.uid, "logs");
-        const cachedGroups = loadCache(user.uid, "groups");
-        if (cachedJobs) renderJobs(cachedJobs);
-        if (cachedLogs) renderLogs(cachedLogs, cachedGroups || []);
+      const cachedJobs = loadCache(user.uid, "jobs");
+      const cachedLogs = loadCache(user.uid, "logs");
+      const cachedGroups = loadCache(user.uid, "groups");
+      if (cachedJobs) {
+        const usageMap = computeUsageMap(cachedLogs || []);
+        renderJobs(cachedJobs, usageMap);
+      }
+      if (cachedLogs) renderLogs(cachedLogs, cachedGroups || []);
         loadJobs(user.uid);
         loadLogs(user.uid);
       } else {
