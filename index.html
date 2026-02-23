@@ -40,7 +40,7 @@
       padding: 24px 16px 40px;
     }
 
-    header {
+    .app > header {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -49,7 +49,7 @@
       flex-wrap: nowrap;
     }
 
-    header h1 {
+    .app > header h1 {
       font-size: 1.8rem;
       margin: 0;
       letter-spacing: 0.5px;
@@ -189,26 +189,71 @@
       margin-top: 12px;
     }
 
+    .jobs-heading-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .jobs-heading-row h2 {
+      margin: 0;
+    }
+
+    .btn-add {
+      background: #16a34a;
+      color: #fff;
+      box-shadow: 0 8px 16px rgba(22, 163, 74, 0.25);
+    }
+
+    .job-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
     .job-btn {
       background: #f3f6fb;
       border: 1px solid var(--border);
       padding: 14px;
       border-radius: 14px;
       text-align: left;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
       cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
       touch-action: manipulation;
     }
 
+    .job-btn-main {
+      min-width: 0;
+    }
+
     .job-btn strong {
       display: block;
       font-size: 1rem;
+      line-height: 1.25;
+      white-space: normal;
+      overflow-wrap: anywhere;
     }
 
-    .job-btn span {
+    .job-meta {
       color: var(--muted);
       font-size: 0.85rem;
+      margin-top: 4px;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .job-btn-amount {
+      color: var(--text);
+      font-size: 0.95rem;
+      font-weight: 700;
+      justify-self: end;
+      white-space: nowrap;
     }
 
     .log-list {
@@ -233,8 +278,9 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
+      position: relative;
       padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.8);
+      background: #e9edf3;
       width: 100%;
       user-select: none;
     }
@@ -251,8 +297,44 @@
       padding-left: 12px;
     }
 
+    .group-middle {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      max-width: 46%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .group-title-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sort-icon-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      line-height: 1;
+      box-shadow: none;
+    }
+
+    .sort-icon-btn:hover {
+      transform: none;
+      background: #f3f6fb;
+      color: var(--text);
+    }
+
     .log-group.paid header {
-      background: rgba(216, 221, 230, 0.7);
+      background: #b9c1cc;
     }
 
     .floating-total {
@@ -269,6 +351,38 @@
       border-radius: 16px;
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
+      cursor: pointer;
+    }
+
+    .floating-total:focus-visible {
+      outline: 2px solid #16a34a;
+      outline-offset: 2px;
+    }
+
+    .paid-filter-total {
+      margin: 0;
+      text-align: center;
+      color: #16a34a;
+      font-weight: 700;
+      font-size: 1.7rem;
+      line-height: 1.15;
+    }
+
+    .paid-filter-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .paid-filter-custom {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .paid-filter-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
     }
 
     .log-item {
@@ -293,6 +407,167 @@
       text-align: left;
       font-size: 0.85rem;
       display: block;
+    }
+
+    .amount-button {
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+      color: inherit;
+      font: inherit;
+      font-weight: 700;
+      cursor: inherit;
+    }
+
+    .logs-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logs-toolbar h2 {
+      margin: 0;
+    }
+
+    .client-filter-slot {
+      display: flex;
+      justify-content: center;
+    }
+
+    .logs-filter-float {
+      display: flex;
+      justify-content: center;
+      margin: 0 0 14px;
+    }
+
+    .client-filter-shell {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d5e3f2;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+      box-shadow: 0 6px 14px rgba(14, 165, 164, 0.12);
+    }
+
+    .client-filter-shell.empty {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .client-filter-shell:focus-within {
+      border-color: #9ccfd0;
+      box-shadow: 0 8px 18px rgba(14, 165, 164, 0.2);
+    }
+
+    .client-filter-trigger {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 36px 9px 14px;
+      border-radius: 999px;
+      text-align: left;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .client-filter-trigger:focus {
+      outline: none;
+    }
+
+    .client-filter-trigger:hover {
+      transform: none;
+    }
+
+    .client-filter-caret {
+      position: absolute;
+      right: 14px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 0.15s ease;
+      pointer-events: none;
+    }
+
+    .client-filter-shell.open .client-filter-caret {
+      transform: rotate(-135deg) translateY(2px);
+    }
+
+    .client-filter-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 20;
+      display: grid;
+      gap: 4px;
+      padding: 6px;
+      border-radius: 16px;
+      border: 1px solid #d5e3f2;
+      background: linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.16);
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      max-height: 300px;
+      overflow: auto;
+    }
+
+    .client-filter-shell.open .client-filter-menu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .client-filter-option {
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text);
+      text-align: left;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 9px 12px;
+      white-space: nowrap;
+    }
+
+    .client-filter-option:hover {
+      background: rgba(14, 165, 164, 0.12);
+      transform: none;
+    }
+
+    .client-filter-option.active {
+      background: #0ea5a4;
+      color: #fff;
+      box-shadow: 0 6px 14px rgba(14, 165, 164, 0.28);
+    }
+
+    .client-choice-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .client-choice-btn {
+      background: #f3f6fb;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .log-client {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
     .muted { color: var(--muted); }
@@ -396,8 +671,14 @@
 
 
     @media (max-width: 600px) {
-      header h1 { font-size: 1.5rem; }
+      .app > header h1 { font-size: 1.5rem; }
       .log-item { grid-template-columns: 1fr auto; align-items: center; }
+      #mark-paid {
+        width: 100%;
+      }
+      .paid-filter-custom {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -433,9 +714,22 @@
         <div class="tab" data-tab="logs">Log List</div>
       </div>
 
+      <div id="logs-filter-row" class="logs-filter-float hidden">
+        <div class="client-filter-slot">
+          <div id="client-filter-shell" class="client-filter-shell empty">
+            <button id="client-filter-trigger" class="client-filter-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">All Clients</button>
+            <span class="client-filter-caret" aria-hidden="true"></span>
+            <div id="client-filter-menu" class="client-filter-menu" role="listbox" aria-label="Client filter"></div>
+          </div>
+        </div>
+      </div>
+
       <div id="jobs-tab" class="card">
-        <h2>Job Presets</h2>
-        <form id="job-form">
+        <div class="jobs-heading-row">
+          <h2>Job Presets</h2>
+          <button class="btn-add" id="show-job-form" type="button">Add</button>
+        </div>
+        <form id="job-form" class="hidden">
           <div style="display:grid; gap:12px; grid-template-columns: 2fr 1fr;">
             <div>
               <label for="job-name">Job Name</label>
@@ -443,10 +737,14 @@
             </div>
             <div>
               <label for="job-amount">Amount</label>
-              <input id="job-amount" type="number" min="0" step="0.01" required placeholder="50.00" />
+              <input id="job-amount" type="number" min="0" step="0.25" required placeholder="50.00" />
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label for="job-clients">Clients (comma separated)</label>
+              <input id="job-clients" placeholder="Type here" />
             </div>
           </div>
-          <div style="display:flex; gap:10px; margin-top:12px;">
+          <div id="job-action-row" class="job-actions hidden">
             <button class="btn-secondary" type="submit">Add Job Preset</button>
             <button class="btn-primary" id="one-time-btn" type="button">Quick Log</button>
           </div>
@@ -455,31 +753,76 @@
       </div>
 
       <div id="logs-tab" class="card hidden">
-        <div style="display:flex; justify-content: space-between; align-items:center; gap:12px;">
+        <div class="logs-toolbar">
           <h2>Log List</h2>
-          <button class="btn-primary" id="mark-paid">Mark Current as Paid</button>
+          <button class="btn-primary" id="mark-paid">Paid</button>
         </div>
         <div class="log-list" id="log-list"></div>
       </div>
 
-      <div class="floating-total">
+      <div id="total-paid-bar" class="floating-total" role="button" tabindex="0" aria-label="Open paid total filters">
         <div class="muted">Total Paid</div>
-        <div id="total-paid" style="font-weight:700; font-size:1.1rem; color:#16a34a;">$0.00</div>
+        <div id="total-paid" style="font-weight:700; font-size:1.1rem; color:#16a34a;">$0</div>
       </div>
 
     </section>
   </div>
 
-  <div class="modal-backdrop" id="datetime-modal">
+  <div class="modal-backdrop" id="paid-filter-modal">
     <div class="modal">
-      <h3>Edit Log Time</h3>
+      <div id="paid-filter-total" class="paid-filter-total">$0</div>
+      <div class="paid-filter-grid">
+        <div>
+          <label for="paid-filter-client">Client</label>
+          <select id="paid-filter-client"></select>
+        </div>
+        <div>
+          <label for="paid-filter-range">Time Range</label>
+          <select id="paid-filter-range">
+            <option value="all">All Time</option>
+            <option value="1y">1 Year</option>
+            <option value="6m">6 Months</option>
+            <option value="3m">3 Months</option>
+            <option value="1m">1 Month</option>
+            <option value="2w">2 Weeks</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div id="paid-filter-custom" class="paid-filter-custom hidden">
+          <div>
+            <label for="paid-filter-from">From</label>
+            <input id="paid-filter-from" type="date" />
+          </div>
+          <div>
+            <label for="paid-filter-to">To</label>
+            <input id="paid-filter-to" type="date" />
+          </div>
+        </div>
+      </div>
+      <div class="paid-filter-actions">
+        <button class="btn-ghost" id="cancel-paid-filter" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="log-edit-modal">
+    <div class="modal small">
+      <h3>Edit Log</h3>
       <div>
-        <label for="datetime-input">Date &amp; Time</label>
-        <input id="datetime-input" type="datetime-local" />
+        <label for="log-edit-name">Title</label>
+        <input id="log-edit-name" placeholder="Log title" />
+      </div>
+      <div>
+        <label for="log-edit-datetime">Date &amp; Time</label>
+        <input id="log-edit-datetime" type="datetime-local" />
+      </div>
+      <div>
+        <label for="log-edit-amount">Amount</label>
+        <input id="log-edit-amount" type="number" min="0" step="0.25" />
       </div>
       <div style="display:flex; gap:10px; justify-content:flex-end;">
-        <button class="btn-ghost" id="cancel-datetime" type="button">Cancel</button>
-        <button class="btn-primary" id="save-datetime" type="button">Save</button>
+        <button class="btn-ghost" id="cancel-log-edit" type="button">Cancel</button>
+        <button class="btn-primary" id="save-log-edit" type="button">Save</button>
       </div>
     </div>
   </div>
@@ -502,7 +845,11 @@
         <label for="job-rename-input">Preset Name</label>
         <input id="job-rename-input" placeholder="Job name" />
       </div>
-      <div class="muted hidden" id="job-rename-hint">Save name for preset only, or update all past logs from this preset.</div>
+      <div>
+        <label for="job-clients-edit">Clients (comma separated)</label>
+        <input id="job-clients-edit" placeholder="Type here" />
+      </div>
+      <div class="muted hidden" id="job-rename-hint">Save preset details only, or update all past logs with the renamed preset title.</div>
       <div class="hidden" id="job-rename-actions" style="display:none; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
         <button class="btn-secondary" id="save-job-only" type="button">Save Preset</button>
         <button class="btn-primary" id="save-job-all" type="button">Save + Update Logs</button>
@@ -510,6 +857,17 @@
       <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
         <button class="btn-ghost" id="cancel-job-delete" type="button">Cancel</button>
         <button class="btn-ghost danger" id="confirm-job-delete" type="button">Delete Preset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="client-picker-modal">
+    <div class="modal small">
+      <h3>Select Client</h3>
+      <div class="muted" id="client-picker-job"></div>
+      <div class="client-choice-grid" id="client-choice-grid"></div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button class="btn-ghost" id="cancel-client-picker" type="button">Cancel</button>
       </div>
     </div>
   </div>
@@ -530,12 +888,41 @@
 
   <div class="modal-backdrop" id="group-modal">
     <div class="modal small">
-      <h3>Paid Group</h3>
+      <h3 id="group-modal-title">Group Options</h3>
       <div class="muted">What do you want to do with this group?</div>
-      <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <div>
+        <label for="group-client-select">Move To Client</label>
+        <select id="group-client-select"></select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
         <button class="btn-ghost" id="cancel-group" type="button">Cancel</button>
         <button class="btn-secondary" id="unpay-group" type="button">Unpay</button>
         <button class="btn-ghost" id="delete-group" type="button">Delete Group</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="sort-modal">
+    <div class="modal small">
+      <h3>Sort Current (Unpaid)</h3>
+      <div>
+        <label for="sort-field">Sort By</label>
+        <select id="sort-field">
+          <option value="date">Date</option>
+          <option value="name">Alphabetical</option>
+          <option value="amount">Amount</option>
+        </select>
+      </div>
+      <div>
+        <label for="sort-direction">Order</label>
+        <select id="sort-direction">
+          <option value="desc">Descending</option>
+          <option value="asc">Ascending</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button class="btn-ghost" id="cancel-sort" type="button">Cancel</button>
+        <button class="btn-primary" id="save-sort" type="button">Apply</button>
       </div>
     </div>
   </div>
@@ -581,29 +968,52 @@
     const logList = document.getElementById("log-list");
     const markPaidBtn = document.getElementById("mark-paid");
     const logoutBtn = document.getElementById("logout");
-    const datetimeModal = document.getElementById("datetime-modal");
-    const datetimeInput = document.getElementById("datetime-input");
-    const cancelDatetimeBtn = document.getElementById("cancel-datetime");
-    const saveDatetimeBtn = document.getElementById("save-datetime");
+    const clientFilterShell = document.getElementById("client-filter-shell");
+    const clientFilterTrigger = document.getElementById("client-filter-trigger");
+    const clientFilterMenu = document.getElementById("client-filter-menu");
+    const logEditModal = document.getElementById("log-edit-modal");
+    const logEditNameInput = document.getElementById("log-edit-name");
+    const logEditDatetimeInput = document.getElementById("log-edit-datetime");
+    const logEditAmountInput = document.getElementById("log-edit-amount");
+    const cancelLogEditBtn = document.getElementById("cancel-log-edit");
+    const saveLogEditBtn = document.getElementById("save-log-edit");
     let activeLogForEdit = null;
     const deleteModal = document.getElementById("delete-modal");
     const cancelDeleteBtn = document.getElementById("cancel-delete");
     const confirmDeleteBtn = document.getElementById("confirm-delete");
     let activeLogForDelete = null;
     const checkOverlay = document.getElementById("check-overlay");
+    const showJobFormBtn = document.getElementById("show-job-form");
     const oneTimeBtn = document.getElementById("one-time-btn");
+    const jobActionRow = document.getElementById("job-action-row");
     const jobNameInput = document.getElementById("job-name");
     const jobAmountInput = document.getElementById("job-amount");
+    const jobClientsInput = document.getElementById("job-clients");
+    const totalPaidBar = document.getElementById("total-paid-bar");
     const totalPaidEl = document.getElementById("total-paid");
+    const paidFilterModal = document.getElementById("paid-filter-modal");
+    const paidFilterTotalEl = document.getElementById("paid-filter-total");
+    const paidFilterClientSelect = document.getElementById("paid-filter-client");
+    const paidFilterRangeSelect = document.getElementById("paid-filter-range");
+    const paidFilterCustomWrap = document.getElementById("paid-filter-custom");
+    const paidFilterFromInput = document.getElementById("paid-filter-from");
+    const paidFilterToInput = document.getElementById("paid-filter-to");
+    const cancelPaidFilterBtn = document.getElementById("cancel-paid-filter");
     const jobDeleteModal = document.getElementById("job-delete-modal");
     const cancelJobDeleteBtn = document.getElementById("cancel-job-delete");
     const confirmJobDeleteBtn = document.getElementById("confirm-job-delete");
     const saveJobOnlyBtn = document.getElementById("save-job-only");
     const saveJobAllBtn = document.getElementById("save-job-all");
     const jobRenameInput = document.getElementById("job-rename-input");
+    const jobClientsEditInput = document.getElementById("job-clients-edit");
     const jobRenameHint = document.getElementById("job-rename-hint");
     const jobRenameActions = document.getElementById("job-rename-actions");
     let activeJobForDelete = null;
+    const clientPickerModal = document.getElementById("client-picker-modal");
+    const clientPickerJob = document.getElementById("client-picker-job");
+    const clientChoiceGrid = document.getElementById("client-choice-grid");
+    const cancelClientPickerBtn = document.getElementById("cancel-client-picker");
+    let activeJobForClientPick = null;
 
     jobRenameHint.classList.add("hidden");
     jobRenameActions.classList.add("hidden");
@@ -611,18 +1021,52 @@
     const displayNameInput = document.getElementById("display-name");
     const closeProfileBtn = document.getElementById("close-profile");
     const groupModal = document.getElementById("group-modal");
+    const groupModalTitle = document.getElementById("group-modal-title");
+    const groupClientSelect = document.getElementById("group-client-select");
     const cancelGroupBtn = document.getElementById("cancel-group");
     const unpayGroupBtn = document.getElementById("unpay-group");
     const deleteGroupBtn = document.getElementById("delete-group");
     let activeGroupForAction = null;
+    const sortModal = document.getElementById("sort-modal");
+    const sortFieldSelect = document.getElementById("sort-field");
+    const sortDirectionSelect = document.getElementById("sort-direction");
+    const cancelSortBtn = document.getElementById("cancel-sort");
+    const saveSortBtn = document.getElementById("save-sort");
 
     const tabs = document.querySelectorAll(".tab");
     const jobsTab = document.getElementById("jobs-tab");
     const logsTab = document.getElementById("logs-tab");
+    const logsFilterRow = document.getElementById("logs-filter-row");
+    const CLIENT_FILTER_ALL = "__all__";
+    const CLIENT_FILTER_NONE = "__none__";
+    let currentClientFilter = CLIENT_FILTER_ALL;
+    let clientFilterOptions = [{ value: CLIENT_FILTER_ALL, label: "All Clients" }];
+    const SORT_FIELD_DATE = "date";
+    const SORT_FIELD_NAME = "name";
+    const SORT_FIELD_AMOUNT = "amount";
+    const SORT_DIR_ASC = "asc";
+    const SORT_DIR_DESC = "desc";
+    let unpaidSortField = SORT_FIELD_DATE;
+    let unpaidSortDirection = SORT_DIR_DESC;
+    const PAID_RANGE_ALL = "all";
+    const PAID_RANGE_1Y = "1y";
+    const PAID_RANGE_6M = "6m";
+    const PAID_RANGE_3M = "3m";
+    const PAID_RANGE_1M = "1m";
+    const PAID_RANGE_2W = "2w";
+    const PAID_RANGE_CUSTOM = "custom";
+    const paidFilterState = {
+      client: CLIENT_FILTER_ALL,
+      range: PAID_RANGE_ALL,
+      from: "",
+      to: ""
+    };
 
     const formatMoney = (value) => new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "USD"
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
     }).format(value || 0);
 
     const formatDate = (date) => new Intl.DateTimeFormat("en-US", {
@@ -634,6 +1078,282 @@
       const pad = (num) => String(num).padStart(2, "0");
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
     };
+
+    const normalizeClientName = (value) => {
+      if (typeof value !== "string") return "";
+      return value.trim();
+    };
+
+    const normalizeClients = (clients) => {
+      const list = Array.isArray(clients) ? clients : [];
+      const unique = new Set();
+      list.forEach((value) => {
+        const normalized = normalizeClientName(value);
+        if (normalized) unique.add(normalized);
+      });
+      return Array.from(unique);
+    };
+
+    const parseClientsInput = (inputValue) => {
+      if (!inputValue) return [];
+      return normalizeClients(inputValue.split(","));
+    };
+
+    const clientsInputValue = (clients) => normalizeClients(clients).join(", ");
+
+    const updateJobActionVisibility = () => {
+      const hasAnyInput = [jobNameInput.value, jobAmountInput.value, jobClientsInput.value]
+        .some((value) => typeof value === "string" && value.trim().length > 0);
+      jobActionRow.classList.toggle("hidden", !hasAnyInput);
+    };
+    jobNameInput.addEventListener("input", updateJobActionVisibility);
+    jobAmountInput.addEventListener("input", updateJobActionVisibility);
+    jobClientsInput.addEventListener("input", updateJobActionVisibility);
+    jobNameInput.addEventListener("change", updateJobActionVisibility);
+    jobAmountInput.addEventListener("change", updateJobActionVisibility);
+    jobClientsInput.addEventListener("change", updateJobActionVisibility);
+    updateJobActionVisibility();
+    const openJobForm = () => {
+      jobForm.classList.remove("hidden");
+      updateJobActionVisibility();
+      jobNameInput.focus();
+    };
+    showJobFormBtn.addEventListener("click", () => {
+      openJobForm();
+    });
+    totalPaidBar.addEventListener("click", () => {
+      openPaidFilterModal();
+    });
+    totalPaidBar.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openPaidFilterModal();
+      }
+    });
+    cancelPaidFilterBtn.addEventListener("click", () => {
+      closePaidFilterModal();
+    });
+    paidFilterClientSelect.addEventListener("change", () => {
+      applyPaidFilter();
+    });
+    paidFilterRangeSelect.addEventListener("change", () => {
+      togglePaidFilterCustom();
+      if (paidFilterRangeSelect.value === PAID_RANGE_CUSTOM && !paidFilterFromInput.value && !paidFilterToInput.value) {
+        const now = new Date();
+        paidFilterFromInput.value = toDateInputValue(new Date(now.getFullYear(), now.getMonth(), 1));
+        paidFilterToInput.value = toDateInputValue(now);
+      }
+      applyPaidFilter();
+    });
+    paidFilterFromInput.addEventListener("input", () => {
+      applyPaidFilter();
+    });
+    paidFilterToInput.addEventListener("input", () => {
+      applyPaidFilter();
+    });
+    paidFilterFromInput.addEventListener("change", () => {
+      applyPaidFilter();
+    });
+    paidFilterToInput.addEventListener("change", () => {
+      applyPaidFilter();
+    });
+    paidFilterModal.addEventListener("click", (e) => {
+      if (e.target === paidFilterModal) closePaidFilterModal();
+    });
+
+    const getClientFilterLabel = (value) => {
+      const found = clientFilterOptions.find((option) => option.value === value);
+      return found ? found.label : "All Clients";
+    };
+
+    const closeClientFilterMenu = () => {
+      clientFilterShell.classList.remove("open");
+      clientFilterTrigger.setAttribute("aria-expanded", "false");
+    };
+
+    const openClientFilterMenu = () => {
+      if (clientFilterShell.classList.contains("empty")) return;
+      clientFilterShell.classList.add("open");
+      clientFilterTrigger.setAttribute("aria-expanded", "true");
+    };
+
+    const setClientFilter = (value) => {
+      currentClientFilter = value || CLIENT_FILTER_ALL;
+      clientFilterTrigger.textContent = getClientFilterLabel(currentClientFilter);
+      closeClientFilterMenu();
+      const uid = auth.currentUser?.uid || localStorage.getItem(lastUidKey);
+      if (!uid) return;
+      persistClientFilter(uid, currentClientFilter);
+      renderLogs(loadCache(uid, "logs") || [], loadCache(uid, "groups") || []);
+    };
+
+    const renderClientFilterMenu = () => {
+      clientFilterMenu.innerHTML = "";
+      clientFilterOptions.forEach((option) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `client-filter-option${option.value === currentClientFilter ? " active" : ""}`;
+        button.dataset.value = option.value;
+        button.textContent = option.label;
+        button.addEventListener("click", () => setClientFilter(option.value));
+        clientFilterMenu.appendChild(button);
+      });
+    };
+
+    const getKnownClientNames = (uid) => {
+      const names = new Set();
+      const logs = loadCache(uid, "logs") || [];
+      logs.forEach((log) => {
+        const client = normalizeClientName(log.clientName);
+        if (client) names.add(client);
+      });
+      const jobs = loadCache(uid, "jobs") || [];
+      jobs.forEach((job) => {
+        normalizeClients(job.clients).forEach((client) => names.add(client));
+      });
+      return Array.from(names).sort((a, b) => a.localeCompare(b));
+    };
+
+    const logMatchesGroup = (log, groupId) => {
+      if (groupId === "unpaid") return !log.groupId;
+      return log.groupId === groupId;
+    };
+
+    const groupLogsQuery = (uid, groupId) => {
+      if (groupId === "unpaid") {
+        return query(logsCollection(uid), where("paid", "==", false));
+      }
+      return query(logsCollection(uid), where("groupId", "==", groupId));
+    };
+
+    const applyGroupClientChange = (uid, groupId, selectedValue) => {
+      const selectedClient = selectedValue === CLIENT_FILTER_NONE ? null : normalizeClientName(selectedValue) || null;
+      const cacheLogs = loadCache(uid, "logs") || [];
+      const updatedLogs = cacheLogs.map((log) => {
+        if (logMatchesGroup(log, groupId)) {
+          return { ...log, clientName: selectedClient };
+        }
+        return log;
+      });
+      saveCache(uid, "logs", updatedLogs);
+      renderLogs(updatedLogs, loadCache(uid, "groups") || []);
+
+      (async () => {
+        try {
+          const logsSnap = await getDocs(groupLogsQuery(uid, groupId));
+          const batch = writeBatch(db);
+          logsSnap.forEach((docSnap) => {
+            batch.set(
+              doc(logsCollection(uid), docSnap.id),
+              { clientName: selectedClient },
+              { merge: true }
+            );
+          });
+          await batch.commit();
+        } catch (err) {
+          console.error(err);
+          await loadLogs(uid);
+        }
+      })();
+    };
+
+    const populateGroupClientSelect = (uid, groupId) => {
+      const clientNames = getKnownClientNames(uid);
+      const logs = loadCache(uid, "logs") || [];
+      const groupLogs = logs.filter((log) => logMatchesGroup(log, groupId));
+      const hasNoClientInGroup = groupLogs.some((log) => !normalizeClientName(log.clientName));
+      const existingGroupClients = new Set(
+        groupLogs
+          .map((log) => normalizeClientName(log.clientName))
+          .filter(Boolean)
+      );
+
+      groupClientSelect.innerHTML = "";
+      const noClientOption = document.createElement("option");
+      noClientOption.value = CLIENT_FILTER_NONE;
+      noClientOption.textContent = "No Client";
+      groupClientSelect.appendChild(noClientOption);
+
+      clientNames.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        groupClientSelect.appendChild(option);
+      });
+
+      groupClientSelect.disabled = false;
+      const preferred = hasNoClientInGroup
+        ? CLIENT_FILTER_NONE
+        : (clientNames.find((name) => existingGroupClients.has(name)) || clientNames[0] || CLIENT_FILTER_NONE);
+      groupClientSelect.value = preferred;
+    };
+
+    const sizeClientFilterToWidestOption = () => {
+      const options = clientFilterOptions;
+      if (!options.length) {
+        clientFilterShell.style.width = "";
+        clientFilterMenu.style.minWidth = "";
+        return;
+      }
+      const measurementCanvas = sizeClientFilterToWidestOption.canvas || document.createElement("canvas");
+      sizeClientFilterToWidestOption.canvas = measurementCanvas;
+      const ctx = measurementCanvas.getContext("2d");
+      if (!ctx) return;
+      const style = window.getComputedStyle(clientFilterTrigger);
+      ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      const widestText = options.reduce((max, option) => {
+        const text = option.label || "";
+        return Math.max(max, ctx.measureText(text).width);
+      }, 0);
+      const bubblePadding = 60;
+      const width = Math.max(120, Math.ceil(widestText + bubblePadding));
+      clientFilterShell.style.width = `${width}px`;
+      clientFilterMenu.style.minWidth = `${width}px`;
+    };
+
+    const updateClientFilterOptions = (logs, jobs = []) => {
+      const current = currentClientFilter || CLIENT_FILTER_ALL;
+      const names = new Set();
+      let hasNoClientLogs = false;
+      (logs || []).forEach((log) => {
+        const client = normalizeClientName(log.clientName);
+        if (client) {
+          names.add(client);
+        } else {
+          hasNoClientLogs = true;
+        }
+      });
+      (jobs || []).forEach((job) => {
+        normalizeClients(job.clients).forEach((client) => names.add(client));
+      });
+      const sortedNames = Array.from(names).sort((a, b) => a.localeCompare(b));
+
+      const options = [{ value: CLIENT_FILTER_ALL, label: "All Clients" }];
+      sortedNames.forEach((name) => options.push({ value: name, label: name }));
+      if (hasNoClientLogs) {
+        options.push({ value: CLIENT_FILTER_NONE, label: "No Client" });
+      }
+      clientFilterOptions = options;
+
+      if (options.length > 1) {
+        clientFilterShell.classList.remove("empty");
+      } else {
+        clientFilterShell.classList.add("empty");
+        closeClientFilterMenu();
+      }
+
+      const selectedExists = options.some((option) => option.value === current);
+      currentClientFilter = selectedExists ? current : CLIENT_FILTER_ALL;
+      clientFilterTrigger.textContent = getClientFilterLabel(currentClientFilter);
+      const uid = auth.currentUser?.uid || localStorage.getItem(lastUidKey);
+      if (uid) persistClientFilter(uid, currentClientFilter);
+      renderClientFilterMenu();
+      sizeClientFilterToWidestOption();
+    };
+
+    window.addEventListener("resize", () => {
+      sizeClientFilterToWidestOption();
+    });
 
     const setAuthMode = () => {
       if (authMode === "signin") {
@@ -690,6 +1410,15 @@
         // ignore cache failures
       }
     };
+    const loadSavedClientFilter = (uid) => {
+      if (!uid) return CLIENT_FILTER_ALL;
+      const saved = loadCache(uid, "client-filter");
+      return typeof saved === "string" && saved ? saved : CLIENT_FILTER_ALL;
+    };
+    const persistClientFilter = (uid, value) => {
+      if (!uid) return;
+      saveCache(uid, "client-filter", value || CLIENT_FILTER_ALL);
+    };
 
     const normalizeDate = (value) => {
       if (!value) return new Date();
@@ -708,6 +1437,192 @@
       return map;
     };
 
+    const toDateInputValue = (date) => {
+      const pad = (num) => String(num).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    };
+
+    const getPaidFilterUid = () => auth.currentUser?.uid || localStorage.getItem(lastUidKey);
+
+    const getPaidLogsForFilter = (uid) => {
+      const logs = loadCache(uid, "logs") || [];
+      return logs.filter((log) => Boolean(log.paid));
+    };
+
+    const populatePaidFilterClientOptions = (paidLogs) => {
+      const names = new Set();
+      let hasNoClient = false;
+      paidLogs.forEach((log) => {
+        const client = normalizeClientName(log.clientName);
+        if (client) names.add(client);
+        else hasNoClient = true;
+      });
+
+      const options = [{ value: CLIENT_FILTER_ALL, label: "All Clients" }];
+      Array.from(names)
+        .sort((a, b) => a.localeCompare(b))
+        .forEach((name) => options.push({ value: name, label: name }));
+      if (hasNoClient) options.push({ value: CLIENT_FILTER_NONE, label: "No Client" });
+
+      paidFilterClientSelect.innerHTML = "";
+      options.forEach((option) => {
+        const el = document.createElement("option");
+        el.value = option.value;
+        el.textContent = option.label;
+        paidFilterClientSelect.appendChild(el);
+      });
+
+      const selected = options.some((option) => option.value === paidFilterState.client)
+        ? paidFilterState.client
+        : CLIENT_FILTER_ALL;
+      paidFilterClientSelect.value = selected;
+      paidFilterState.client = selected;
+    };
+
+    const togglePaidFilterCustom = () => {
+      const showCustom = paidFilterRangeSelect.value === PAID_RANGE_CUSTOM;
+      paidFilterCustomWrap.classList.toggle("hidden", !showCustom);
+    };
+
+    const getPaidTimeBounds = () => {
+      const range = paidFilterState.range;
+      if (range === PAID_RANGE_ALL) return { start: null, end: null };
+
+      if (range === PAID_RANGE_CUSTOM) {
+        let start = null;
+        let end = null;
+        if (paidFilterState.from) {
+          const [y, m, d] = paidFilterState.from.split("-").map(Number);
+          start = new Date(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+        }
+        if (paidFilterState.to) {
+          const [y, m, d] = paidFilterState.to.split("-").map(Number);
+          end = new Date(y, (m || 1) - 1, d || 1, 23, 59, 59, 999);
+        }
+        if (start && end && end < start) {
+          const swappedStart = new Date(end);
+          swappedStart.setHours(0, 0, 0, 0);
+          const swappedEnd = new Date(start);
+          swappedEnd.setHours(23, 59, 59, 999);
+          return { start: swappedStart, end: swappedEnd };
+        }
+        return { start, end };
+      }
+
+      const end = new Date();
+      const start = new Date(end);
+      if (range === PAID_RANGE_1Y) {
+        start.setFullYear(start.getFullYear() - 1);
+      } else if (range === PAID_RANGE_6M) {
+        start.setMonth(start.getMonth() - 6);
+      } else if (range === PAID_RANGE_3M) {
+        start.setMonth(start.getMonth() - 3);
+      } else if (range === PAID_RANGE_1M) {
+        start.setMonth(start.getMonth() - 1);
+      } else if (range === PAID_RANGE_2W) {
+        start.setDate(start.getDate() - 14);
+      }
+      return { start, end };
+    };
+
+    const calculatePaidFilterTotal = (paidLogs) => {
+      const selectedClient = paidFilterState.client || CLIENT_FILTER_ALL;
+      const { start, end } = getPaidTimeBounds();
+      return paidLogs.reduce((sum, log) => {
+        const client = normalizeClientName(log.clientName);
+        if (selectedClient === CLIENT_FILTER_NONE && client) return sum;
+        if (selectedClient !== CLIENT_FILTER_ALL && selectedClient !== CLIENT_FILTER_NONE && client !== selectedClient) {
+          return sum;
+        }
+        const createdAt = normalizeDate(log.createdAt).getTime();
+        if (start && createdAt < start.getTime()) return sum;
+        if (end && createdAt > end.getTime()) return sum;
+        return sum + (Number(log.amount) || 0);
+      }, 0);
+    };
+
+    const closePaidFilterModal = () => {
+      paidFilterModal.classList.remove("show");
+    };
+
+    const applyPaidFilter = () => {
+      const uid = getPaidFilterUid();
+      if (!uid) return;
+      paidFilterState.client = paidFilterClientSelect.value || CLIENT_FILTER_ALL;
+      paidFilterState.range = paidFilterRangeSelect.value || PAID_RANGE_ALL;
+      paidFilterState.from = paidFilterFromInput.value || "";
+      paidFilterState.to = paidFilterToInput.value || "";
+      const paidLogs = getPaidLogsForFilter(uid);
+      const total = calculatePaidFilterTotal(paidLogs);
+      paidFilterTotalEl.textContent = formatMoney(total);
+    };
+
+    const openPaidFilterModal = () => {
+      const uid = getPaidFilterUid();
+      if (!uid) return;
+      const paidLogs = getPaidLogsForFilter(uid);
+      populatePaidFilterClientOptions(paidLogs);
+      paidFilterRangeSelect.value = paidFilterState.range || PAID_RANGE_ALL;
+      paidFilterFromInput.value = paidFilterState.from || "";
+      paidFilterToInput.value = paidFilterState.to || "";
+      if (!paidFilterFromInput.value && !paidFilterToInput.value && paidFilterState.range === PAID_RANGE_CUSTOM) {
+        const now = new Date();
+        paidFilterFromInput.value = toDateInputValue(new Date(now.getFullYear(), now.getMonth(), 1));
+        paidFilterToInput.value = toDateInputValue(now);
+      }
+      togglePaidFilterCustom();
+      applyPaidFilter();
+      paidFilterModal.classList.add("show");
+    };
+
+    const closeClientPicker = () => {
+      activeJobForClientPick = null;
+      clientPickerJob.textContent = "";
+      clientChoiceGrid.innerHTML = "";
+      clientPickerModal.classList.remove("show");
+    };
+
+    const closeSortModal = () => {
+      sortModal.classList.remove("show");
+    };
+
+    const openSortModal = () => {
+      sortFieldSelect.value = unpaidSortField;
+      sortDirectionSelect.value = unpaidSortDirection;
+      sortModal.classList.add("show");
+    };
+
+    const openClientPicker = (job) => {
+      const clients = normalizeClients(job.clients);
+      const user = auth.currentUser;
+      if (!user) return;
+      if (clients.length <= 1) {
+        addLog(user.uid, job.id, job, clients[0] || null);
+        return;
+      }
+
+      activeJobForClientPick = job;
+      clientPickerJob.textContent = job.name;
+      clientChoiceGrid.innerHTML = "";
+
+      clients.forEach((clientName) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "client-choice-btn";
+        button.textContent = clientName;
+        button.addEventListener("click", () => {
+          const currentUser = auth.currentUser;
+          const selectedJob = activeJobForClientPick;
+          if (!currentUser || !selectedJob) return;
+          closeClientPicker();
+          addLog(currentUser.uid, selectedJob.id, selectedJob, clientName);
+        });
+        clientChoiceGrid.appendChild(button);
+      });
+
+      clientPickerModal.classList.add("show");
+    };
+
     const renderJobs = (jobs, usageMap = null) => {
       jobGrid.innerHTML = "";
       const sorted = [...jobs].sort((a, b) => {
@@ -720,22 +1635,56 @@
         const button = document.createElement("button");
         button.className = "job-btn";
         button.dataset.jobId = job.id;
-        button.innerHTML = `<strong>${job.name}</strong><span>${formatMoney(job.amount)}</span>`;
-        button.addEventListener("click", () => addLog(auth.currentUser.uid, job.id, job));
+        const clients = normalizeClients(job.clients);
+        const clientMeta = clients.length === 1
+          ? clients[0]
+          : (clients.length > 1 ? `${clients.length} clients` : "");
+        button.innerHTML = `
+          <div class="job-btn-main">
+            <strong>${job.name}</strong>
+            ${clientMeta ? `<div class="job-meta">${clientMeta}</div>` : ""}
+          </div>
+          <span class="job-btn-amount">${formatMoney(job.amount)}</span>
+        `;
+        button.addEventListener("click", () => openClientPicker(job));
         button.oncontextmenu = () => false;
         jobGrid.appendChild(button);
       });
     };
 
+    const sortUnpaidLogs = (logs) => {
+      const sorted = [...(logs || [])];
+      sorted.sort((a, b) => {
+        let compare = 0;
+        if (unpaidSortField === SORT_FIELD_DATE) {
+          compare = normalizeDate(a.createdAt) - normalizeDate(b.createdAt);
+        } else if (unpaidSortField === SORT_FIELD_NAME) {
+          compare = (a.jobName || "").localeCompare(b.jobName || "", undefined, { sensitivity: "base" });
+        } else {
+          compare = (Number(a.amount) || 0) - (Number(b.amount) || 0);
+        }
+        if (compare === 0) {
+          compare = normalizeDate(a.createdAt) - normalizeDate(b.createdAt);
+        }
+        return unpaidSortDirection === SORT_DIR_ASC ? compare : -compare;
+      });
+      return sorted;
+    };
+
     const renderLogs = (logs, groups) => {
       logList.innerHTML = "";
+      const allLogs = logs || [];
       const groupMap = {};
       (groups || []).forEach((g) => { groupMap[g.id] = g; });
 
-      const usageMap = computeUsageMap(logs);
-      const cachedJobs = loadCache(auth.currentUser?.uid || "", "jobs");
-      if (cachedJobs && auth.currentUser) {
-        const updatedJobs = cachedJobs.map((job) => ({
+      const usageMap = computeUsageMap(allLogs);
+      const cachedJobs = loadCache(auth.currentUser?.uid || "", "jobs") || [];
+      const normalizedJobs = cachedJobs.map((job) => ({
+        ...job,
+        clients: normalizeClients(job.clients)
+      }));
+      if (normalizedJobs.length && auth.currentUser) {
+        const updatedJobs = normalizedJobs.map((job) => ({
           ...job,
           usageCount: usageMap[job.id] || 0
         }));
@@ -743,13 +1692,24 @@
         renderJobs(updatedJobs, usageMap);
       }
 
+      updateClientFilterOptions(allLogs, normalizedJobs);
+
+      const filteredLogs = allLogs.filter((log) => {
+        const client = normalizeClientName(log.clientName);
+        if (currentClientFilter === CLIENT_FILTER_ALL) return true;
+        if (currentClientFilter === CLIENT_FILTER_NONE) return !client;
+        return client === currentClientFilter;
+      });
+
       const grouped = { unpaid: [] };
-      const sortedLogs = [...(logs || [])].sort((a, b) => normalizeDate(b.createdAt) - normalizeDate(a.createdAt));
+      const sortedLogs = [...filteredLogs].sort((a, b) => normalizeDate(b.createdAt) - normalizeDate(a.createdAt));
       sortedLogs.forEach((log) => {
         const key = log.groupId || "unpaid";
         if (!grouped[key]) grouped[key] = [];
         grouped[key].push(log);
       });
+      grouped.unpaid = sortUnpaidLogs(grouped.unpaid || []);
+      markPaidBtn.classList.toggle("hidden", grouped.unpaid.length === 0);
 
       const renderGroup = (title, groupLogs, paid = false, showTotal = false, groupKey = "unpaid", subtitle = "") => {
         const groupEl = document.createElement("div");
@@ -759,11 +1719,20 @@
         header.oncontextmenu = () => false;
         const total = groupLogs.reduce((sum, log) => sum + (Number(log.amount) || 0), 0);
         const rightText = showTotal ? `${groupLogs.length} items · ${formatMoney(total)}` : `${groupLogs.length} items`;
+        const primaryClient = normalizeClientName(groupLogs[0]?.clientName);
+        const hasSingleGroupClient = Boolean(primaryClient)
+          && groupLogs.every((log) => normalizeClientName(log.clientName) === primaryClient);
+        const showGroupClientInHeader = currentClientFilter === CLIENT_FILTER_ALL && hasSingleGroupClient;
+        const hideRowClientNames = currentClientFilter !== CLIENT_FILTER_ALL || showGroupClientInHeader;
+        const titleHtml = groupKey === "unpaid"
+          ? `<div class="group-title-row"><strong>${title}</strong><button class="sort-icon-btn" type="button" data-open-sort="unpaid" title="Sort current logs" aria-label="Sort current unpaid logs">⇅</button></div>`
+          : `<strong>${title}</strong>`;
         header.innerHTML = `
           <div class="group-left">
-            <strong>${title}</strong>
+            ${titleHtml}
             ${subtitle ? `<div class="muted">${subtitle}</div>` : ""}
           </div>
+          ${showGroupClientInHeader ? `<div class="muted group-middle">${primaryClient}</div>` : ""}
           <div class="muted group-right">${rightText}</div>
         `;
         groupEl.appendChild(header);
@@ -773,12 +1742,14 @@
           row.className = "log-item";
           row.dataset.logId = log.id;
           const createdAt = normalizeDate(log.createdAt);
+          const clientName = normalizeClientName(log.clientName);
           row.innerHTML = `
             <div>
               <strong>${log.jobName}</strong>
-              <button class="date-button" data-log-id="${log.id}">${formatDate(createdAt)}</button>
+              ${!hideRowClientNames && clientName ? `<div class="log-client">${clientName}</div>` : ""}
+              <div class="date-button">${formatDate(createdAt)}</div>
             </div>
-            <div><strong>${formatMoney(log.amount)}</strong></div>
+            <div><div class="amount-button">${formatMoney(log.amount)}</div></div>
           `;
           row.oncontextmenu = () => false;
           groupEl.appendChild(row);
@@ -803,7 +1774,7 @@
           renderGroup("Paid", grouped[groupId], true, true, groupId, paidDate);
         });
 
-      const paidTotal = (logs || []).reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0);
+      const paidTotal = allLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0);
       totalPaidEl.textContent = formatMoney(paidTotal);
     };
 
@@ -815,12 +1786,12 @@
         jobs.push({
           id: docSnap.id,
           ...job,
+          clients: normalizeClients(job.clients),
           createdAt: job.createdAt?.toMillis ? job.createdAt.toMillis() : Date.now()
         });
       });
       saveCache(uid, "jobs", jobs);
-      const usageMap = computeUsageMap(loadCache(uid, "logs") || []);
-      renderJobs(jobs, usageMap);
+      renderLogs(loadCache(uid, "logs") || [], loadCache(uid, "groups") || []);
     };
 
     const loadLogs = async (uid) => {
@@ -834,6 +1805,7 @@
         logs.push({
           id: logDoc.id,
           ...log,
+          clientName: normalizeClientName(log.clientName) || null,
           createdAt: log.createdAt?.toMillis ? log.createdAt.toMillis() : Date.now()
         });
       });
@@ -851,13 +1823,15 @@
       renderLogs(logs, groups);
     };
 
-    const addLog = async (uid, jobId, job) => {
+    const addLog = async (uid, jobId, job, clientName = null) => {
+      const normalizedClient = normalizeClientName(clientName) || null;
       showCheck();
       const cacheLogs = loadCache(uid, "logs") || [];
       cacheLogs.unshift({
         id: `local-${Date.now()}`,
         jobId,
         jobName: job.name,
+        clientName: normalizedClient,
         amount: job.amount,
         createdAt: Date.now(),
         paid: false,
@@ -884,6 +1858,7 @@
       await addDoc(logsCollection(uid), {
         jobId,
         jobName: job.name,
+        clientName: normalizedClient,
         amount: job.amount,
         createdAt: serverTimestamp(),
         paid: false,
@@ -908,6 +1883,7 @@
         id: `local-${Date.now()}`,
         jobId: null,
         jobName: name,
+        clientName: null,
         amount,
         createdAt: Date.now(),
         paid: false,
@@ -921,6 +1897,7 @@
       await addDoc(logsCollection(uid), {
         jobId: null,
         jobName: name,
+        clientName: null,
         amount,
         createdAt: serverTimestamp(),
         paid: false,
@@ -939,6 +1916,7 @@
       e.preventDefault();
       const name = document.getElementById("job-name").value.trim();
       const amount = parseFloat(document.getElementById("job-amount").value);
+      const clients = parseClientsInput(jobClientsInput.value);
       const user = auth.currentUser;
       if (!user) return;
       if (!name || Number.isNaN(amount)) return;
@@ -946,11 +1924,14 @@
       await addDoc(jobsCollection(user.uid), {
         name,
         amount,
+        clients,
         createdAt: serverTimestamp(),
         usageCount: 0
       });
 
       jobForm.reset();
+      updateJobActionVisibility();
+      jobForm.classList.add("hidden");
       await loadJobs(user.uid);
     });
 
@@ -988,7 +1969,7 @@
           if (header) {
             const now = new Date();
             const count = unpaidGroup.querySelectorAll(".log-item").length;
-            const total = Array.from(unpaidGroup.querySelectorAll(".log-item strong:last-child")).reduce((sum, el) => {
+            const total = Array.from(unpaidGroup.querySelectorAll(".amount-button")).reduce((sum, el) => {
               const value = Number(el.textContent.replace(/[^0-9.-]+/g, ""));
               return sum + (Number.isNaN(value) ? 0 : value);
             }, 0);
@@ -1020,6 +2001,7 @@
         totalPaidEl.textContent = formatMoney(
           updatedLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
         );
+        await loadLogs(user.uid);
       } catch (err) {
         console.error(err);
         alert(err.message || "Could not mark as paid. Check Firestore indexes.");
@@ -1035,53 +2017,124 @@
       await addOneTimeLog(user.uid, name, amount);
       jobNameInput.value = "";
       jobAmountInput.value = "";
+      jobClientsInput.value = "";
+      updateJobActionVisibility();
+      jobForm.classList.add("hidden");
     });
 
-    logList.addEventListener("click", (e) => {
-      const button = e.target.closest("button[data-log-id]");
-      if (!button) return;
-      const logId = button.dataset.logId;
-      const displayText = button.textContent;
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const logDoc = Array.from(logList.querySelectorAll("button[data-log-id]")).find((el) => el.dataset.logId === logId);
-      if (!logDoc) return;
-
-      activeLogForEdit = { uid: user.uid, logId };
-      const fallbackDate = new Date();
-      const currentDate = displayText ? new Date(displayText) : fallbackDate;
-      datetimeInput.value = toLocalInputValue(isNaN(currentDate) ? fallbackDate : currentDate);
-      datetimeModal.classList.add("show");
-    });
-
-    cancelDatetimeBtn.addEventListener("click", () => {
-      activeLogForEdit = null;
-      datetimeModal.classList.remove("show");
-    });
-
-    datetimeModal.addEventListener("click", (e) => {
-      if (e.target === datetimeModal) {
-        activeLogForEdit = null;
-        datetimeModal.classList.remove("show");
+    clientFilterTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (clientFilterShell.classList.contains("open")) {
+        closeClientFilterMenu();
+      } else {
+        openClientFilterMenu();
       }
     });
 
-    saveDatetimeBtn.addEventListener("click", async () => {
+    clientFilterMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!clientFilterShell.contains(e.target)) closeClientFilterMenu();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeClientFilterMenu();
+        closeSortModal();
+        closePaidFilterModal();
+        activeLogForEdit = null;
+        logEditModal.classList.remove("show");
+      }
+    });
+
+    cancelClientPickerBtn.addEventListener("click", () => {
+      closeClientPicker();
+    });
+
+    clientPickerModal.addEventListener("click", (e) => {
+      if (e.target === clientPickerModal) closeClientPicker();
+    });
+
+    const closeLogEditModal = () => {
+      activeLogForEdit = null;
+      logEditModal.classList.remove("show");
+    };
+
+    const openLogEditModal = (uid, logId) => {
+      const logs = loadCache(uid, "logs") || [];
+      const log = logs.find((entry) => entry.id === logId);
+      if (!log) return;
+      activeLogForEdit = { uid, logId };
+      logEditNameInput.value = log.jobName || "";
+      logEditDatetimeInput.value = toLocalInputValue(normalizeDate(log.createdAt));
+      const currentAmount = Number(log.amount);
+      logEditAmountInput.value = Number.isFinite(currentAmount) ? currentAmount.toFixed(2) : "";
+      logEditModal.classList.add("show");
+    };
+
+    logList.addEventListener("click", (e) => {
+      const sortButton = e.target.closest("button[data-open-sort]");
+      if (sortButton) {
+        openSortModal();
+      }
+    });
+
+    cancelSortBtn.addEventListener("click", () => {
+      closeSortModal();
+    });
+
+    sortModal.addEventListener("click", (e) => {
+      if (e.target === sortModal) closeSortModal();
+    });
+
+    saveSortBtn.addEventListener("click", () => {
+      const field = sortFieldSelect.value;
+      const direction = sortDirectionSelect.value;
+      if ([SORT_FIELD_DATE, SORT_FIELD_NAME, SORT_FIELD_AMOUNT].includes(field)) {
+        unpaidSortField = field;
+      }
+      if ([SORT_DIR_ASC, SORT_DIR_DESC].includes(direction)) {
+        unpaidSortDirection = direction;
+      }
+      closeSortModal();
+      const user = auth.currentUser;
+      if (!user) return;
+      renderLogs(loadCache(user.uid, "logs") || [], loadCache(user.uid, "groups") || []);
+    });
+
+    cancelLogEditBtn.addEventListener("click", () => {
+      closeLogEditModal();
+    });
+
+    logEditModal.addEventListener("click", (e) => {
+      if (e.target === logEditModal) closeLogEditModal();
+    });
+
+    saveLogEditBtn.addEventListener("click", async () => {
       if (!activeLogForEdit) return;
       const { uid, logId } = activeLogForEdit;
-      const value = datetimeInput.value;
-      if (!value) return;
-      const date = new Date(value);
+      const name = logEditNameInput.value.trim();
+      const dateValue = logEditDatetimeInput.value;
+      const amount = parseFloat(logEditAmountInput.value);
+      if (!name || !dateValue || Number.isNaN(amount) || amount < 0) return;
+      const date = new Date(dateValue);
+      if (Number.isNaN(date.getTime())) return;
       await updateDoc(doc(logsCollection(uid), logId), {
-        createdAt: Timestamp.fromDate(date)
+        jobName: name,
+        createdAt: Timestamp.fromDate(date),
+        amount
       });
-      activeLogForEdit = null;
-      datetimeModal.classList.remove("show");
+      closeLogEditModal();
       await loadLogs(uid);
     });
 
     let pressTimer = null;
+    let pressedLogForEdit = null;
+    let didLongPress = false;
+    let didPressMove = false;
+    let logPressStart = null;
     const pressDelay = 550;
 
     logList.addEventListener("pointerdown", (e) => {
@@ -1092,32 +2145,64 @@
       if (!logId) return;
       const user = auth.currentUser;
       if (!user) return;
+      pressedLogForEdit = { uid: user.uid, logId };
+      didLongPress = false;
+      didPressMove = false;
+      logPressStart = { x: e.clientX, y: e.clientY };
       e.preventDefault();
       pressTimer = setTimeout(() => {
+        didLongPress = true;
         activeLogForDelete = { uid: user.uid, logId };
         deleteModal.classList.add("show");
       }, pressDelay);
     });
 
-    const clearPress = () => {
+    const clearPressTimer = () => {
       if (pressTimer) {
         clearTimeout(pressTimer);
         pressTimer = null;
       }
     };
 
-    logList.addEventListener("pointerup", clearPress);
-    logList.addEventListener("pointerleave", clearPress);
-    logList.addEventListener("pointercancel", clearPress);
-    logList.addEventListener("pointermove", clearPress);
+    const resetLogPressState = () => {
+      clearPressTimer();
+      pressedLogForEdit = null;
+      didLongPress = false;
+      didPressMove = false;
+      logPressStart = null;
+    };
+
+    logList.addEventListener("pointerup", () => {
+      const pressTarget = pressedLogForEdit;
+      const wasLongPress = didLongPress;
+      const wasMoved = didPressMove;
+      clearPressTimer();
+      pressedLogForEdit = null;
+      didLongPress = false;
+      didPressMove = false;
+      logPressStart = null;
+      if (!pressTarget || wasLongPress || wasMoved) return;
+      openLogEditModal(pressTarget.uid, pressTarget.logId);
+    });
+    logList.addEventListener("pointerleave", resetLogPressState);
+    logList.addEventListener("pointercancel", resetLogPressState);
+    logList.addEventListener("pointermove", (e) => {
+      if (!logPressStart) return;
+      const dx = Math.abs(e.clientX - logPressStart.x);
+      const dy = Math.abs(e.clientY - logPressStart.y);
+      if (dx > 8 || dy > 8) {
+        didPressMove = true;
+        clearPressTimer();
+      }
+    });
     logList.addEventListener("contextmenu", (e) => {
       const item = e.target.closest(".log-item");
-      const header = e.target.closest(".log-group.paid header");
+      const header = e.target.closest(".log-group header");
       if (item || header) e.preventDefault();
     });
 
     document.addEventListener("contextmenu", (e) => {
-      if (e.target.closest(".log-item, .log-group.paid header")) {
+      if (e.target.closest(".log-item, .log-group header")) {
         e.preventDefault();
       }
     }, true);
@@ -1144,12 +2229,15 @@
         const cacheJobs = loadCache(user.uid, "jobs") || [];
         const job = cacheJobs.find((j) => j.id === button.dataset.jobId);
         jobRenameInput.value = job?.name || "";
-    jobRenameInput.dataset.original = job?.name || "";
-    jobRenameHint.classList.add("hidden");
-    jobRenameActions.classList.add("hidden");
-    jobRenameActions.style.display = "none";
-    activeJobForDelete = { uid: user.uid, jobId: button.dataset.jobId };
-    jobDeleteModal.classList.add("show");
+        jobRenameInput.dataset.original = job?.name || "";
+        const originalClients = clientsInputValue(job?.clients || []);
+        jobClientsEditInput.value = originalClients;
+        jobClientsEditInput.dataset.original = originalClients;
+        jobRenameHint.classList.add("hidden");
+        jobRenameActions.classList.add("hidden");
+        jobRenameActions.style.display = "none";
+        activeJobForDelete = { uid: user.uid, jobId: button.dataset.jobId };
+        jobDeleteModal.classList.add("show");
       }, pressDelay);
     }, true);
 
@@ -1170,10 +2258,14 @@
       }
     });
 
-    jobRenameInput.addEventListener("input", () => {
+    const refreshJobEditState = () => {
       const original = jobRenameInput.dataset.original || "";
       const current = jobRenameInput.value.trim();
-      const changed = current && current !== original;
+      const originalClients = jobClientsEditInput.dataset.original || "";
+      const currentClients = clientsInputValue(parseClientsInput(jobClientsEditInput.value));
+      const changedName = current && current !== original;
+      const changedClients = currentClients !== originalClients;
+      const changed = changedName || changedClients;
       if (changed) {
         jobRenameHint.classList.remove("hidden");
         jobRenameActions.classList.remove("hidden");
@@ -1183,38 +2275,58 @@
         jobRenameActions.classList.add("hidden");
         jobRenameActions.style.display = "none";
       }
-    });
+    };
+
+    jobRenameInput.addEventListener("input", refreshJobEditState);
+    jobClientsEditInput.addEventListener("input", refreshJobEditState);
 
     const renameJob = async (applyToLogs) => {
       if (!activeJobForDelete) return;
       const { uid, jobId } = activeJobForDelete;
       const newName = jobRenameInput.value.trim();
+      const newClients = parseClientsInput(jobClientsEditInput.value);
+      const originalName = jobRenameInput.dataset.original || "";
+      const originalClients = jobClientsEditInput.dataset.original || "";
+      const normalizedClients = clientsInputValue(newClients);
+      const nameChanged = newName !== originalName;
+      const clientsChanged = normalizedClients !== originalClients;
       if (!newName) return;
+      if (!nameChanged && !clientsChanged) {
+        activeJobForDelete = null;
+        jobDeleteModal.classList.remove("show");
+        return;
+      }
       activeJobForDelete = null;
       jobDeleteModal.classList.remove("show");
 
       const cacheJobs = loadCache(uid, "jobs") || [];
       const updatedJobs = cacheJobs.map((job) => {
-        if (job.id === jobId) return { ...job, name: newName };
+        if (job.id === jobId) return { ...job, name: newName, clients: newClients };
         return job;
       });
       saveCache(uid, "jobs", updatedJobs);
       renderJobs(updatedJobs, computeUsageMap(loadCache(uid, "logs") || []));
+      const cachedGroups = loadCache(uid, "groups") || [];
 
-      if (applyToLogs) {
+      if (applyToLogs && nameChanged) {
         const cacheLogs = loadCache(uid, "logs") || [];
         const updatedLogs = cacheLogs.map((log) => {
           if (log.jobId === jobId) return { ...log, jobName: newName };
           return log;
         });
         saveCache(uid, "logs", updatedLogs);
-        renderLogs(updatedLogs, loadCache(uid, "groups") || []);
+        renderLogs(updatedLogs, cachedGroups);
+      } else {
+        renderLogs(loadCache(uid, "logs") || [], cachedGroups);
       }
 
       (async () => {
         try {
-          await updateDoc(doc(jobsCollection(uid), jobId), { name: newName });
-          if (applyToLogs) {
+          await updateDoc(doc(jobsCollection(uid), jobId), {
+            name: newName,
+            clients: newClients
+          });
+          if (applyToLogs && nameChanged) {
             const logsSnap = await getDocs(query(logsCollection(uid), where("jobId", "==", jobId)));
             const batch = writeBatch(db);
             logsSnap.forEach((docSnap) => {
@@ -1243,6 +2355,7 @@
       const updatedJobs = cacheJobs.filter((job) => job.id !== jobId);
       saveCache(uid, "jobs", updatedJobs);
       renderJobs(updatedJobs, computeUsageMap(loadCache(uid, "logs") || []));
+      renderLogs(loadCache(uid, "logs") || [], loadCache(uid, "groups") || []);
 
       (async () => {
         try {
@@ -1263,17 +2376,22 @@
     };
 
     logList.addEventListener("pointerdown", (e) => {
-      const header = e.target.closest(".log-group.paid header");
+      if (e.target.closest("button[data-open-sort]")) return;
+      const header = e.target.closest(".log-group header");
       if (!header) return;
-      const groupEl = header.closest(".log-group.paid");
+      const groupEl = header.closest(".log-group");
       if (!groupEl) return;
       const groupId = groupEl.dataset.groupKey;
-      if (!groupId || groupId === "unpaid") return;
+      if (!groupId) return;
       const user = auth.currentUser;
       if (!user) return;
       e.preventDefault();
       groupPressTimer = setTimeout(() => {
+        const isUnpaidGroup = groupId === "unpaid";
+        groupModalTitle.textContent = isUnpaidGroup ? "Current Group" : "Paid Group";
+        unpayGroupBtn.classList.toggle("hidden", isUnpaidGroup);
         activeGroupForAction = { uid: user.uid, groupId };
+        populateGroupClientSelect(user.uid, groupId);
         groupModal.classList.add("show");
       }, pressDelay);
     });
@@ -1282,6 +2400,15 @@
     logList.addEventListener("pointerleave", clearGroupPress);
     logList.addEventListener("pointercancel", clearGroupPress);
     logList.addEventListener("pointermove", clearGroupPress);
+
+    groupClientSelect.addEventListener("change", () => {
+      if (!activeGroupForAction) return;
+      const { uid, groupId } = activeGroupForAction;
+      const selectedClient = groupClientSelect.value;
+      activeGroupForAction = null;
+      groupModal.classList.remove("show");
+      applyGroupClientChange(uid, groupId, selectedClient);
+    });
 
     cancelGroupBtn.addEventListener("click", () => {
       activeGroupForAction = null;
@@ -1298,42 +2425,33 @@
     unpayGroupBtn.addEventListener("click", async () => {
       if (!activeGroupForAction) return;
       const { uid, groupId } = activeGroupForAction;
-      const groupEl = logList.querySelector(`.log-group[data-group-key="${groupId}"]`);
+      if (groupId === "unpaid") {
+        activeGroupForAction = null;
+        groupModal.classList.remove("show");
+        return;
+      }
       activeGroupForAction = null;
       groupModal.classList.remove("show");
 
       const cacheLogs = loadCache(uid, "logs") || [];
       const updatedLogs = cacheLogs.map((log) => {
-        if (log.groupId === groupId) {
+        if (logMatchesGroup(log, groupId)) {
           return { ...log, paid: false, groupId: null };
         }
         return log;
       });
       const cacheGroups = loadCache(uid, "groups") || [];
+      const updatedGroups = cacheGroups.filter((g) => g.id !== groupId);
       saveCache(uid, "logs", updatedLogs);
-      saveCache(uid, "groups", cacheGroups.filter((g) => g.id !== groupId));
+      saveCache(uid, "groups", updatedGroups);
       totalPaidEl.textContent = formatMoney(
         updatedLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
       );
-
-      if (groupEl) {
-        groupEl.classList.remove("paid");
-        groupEl.dataset.groupKey = "unpaid";
-        const header = groupEl.querySelector("header");
-        if (header) {
-          const total = Array.from(groupEl.querySelectorAll(".log-item strong:last-child")).reduce((sum, el) => {
-            const value = Number(el.textContent.replace(/[^0-9.-]+/g, ""));
-            return sum + (Number.isNaN(value) ? 0 : value);
-          }, 0);
-          const count = groupEl.querySelectorAll(".log-item").length;
-          header.innerHTML = `<div><strong>Current (Unpaid)</strong></div><div class="muted">${count} items · ${formatMoney(total)}</div>`;
-        }
-        logList.prepend(groupEl);
-      }
+      renderLogs(updatedLogs, updatedGroups);
 
       (async () => {
         try {
-          const logsSnap = await getDocs(query(logsCollection(uid), where("groupId", "==", groupId)));
+          const logsSnap = await getDocs(groupLogsQuery(uid, groupId));
           const batch = writeBatch(db);
           logsSnap.forEach((docSnap) => {
             batch.set(doc(logsCollection(uid), docSnap.id), { paid: false, groupId: null }, { merge: true });
@@ -1350,29 +2468,30 @@
     deleteGroupBtn.addEventListener("click", async () => {
       if (!activeGroupForAction) return;
       const { uid, groupId } = activeGroupForAction;
-      const groupEl = logList.querySelector(`.log-group[data-group-key="${groupId}"]`);
       activeGroupForAction = null;
       groupModal.classList.remove("show");
 
       const cacheLogs = loadCache(uid, "logs") || [];
       const cacheGroups = loadCache(uid, "groups") || [];
-      saveCache(uid, "logs", cacheLogs.filter((log) => log.groupId !== groupId));
-      saveCache(uid, "groups", cacheGroups.filter((g) => g.id !== groupId));
-      const remainingLogs = loadCache(uid, "logs") || [];
+      const remainingLogs = cacheLogs.filter((log) => !logMatchesGroup(log, groupId));
+      const remainingGroups = groupId === "unpaid" ? cacheGroups : cacheGroups.filter((g) => g.id !== groupId);
+      saveCache(uid, "logs", remainingLogs);
+      saveCache(uid, "groups", remainingGroups);
       totalPaidEl.textContent = formatMoney(
         remainingLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
       );
-
-      if (groupEl) groupEl.remove();
+      renderLogs(remainingLogs, remainingGroups);
 
       (async () => {
         try {
-          const logsSnap = await getDocs(query(logsCollection(uid), where("groupId", "==", groupId)));
+          const logsSnap = await getDocs(groupLogsQuery(uid, groupId));
           const batch = writeBatch(db);
           logsSnap.forEach((docSnap) => {
             batch.delete(doc(logsCollection(uid), docSnap.id));
           });
-          batch.delete(doc(groupsCollection(uid), groupId));
+          if (groupId !== "unpaid") {
+            batch.delete(doc(groupsCollection(uid), groupId));
+          }
           await batch.commit();
         } catch (err) {
           console.error(err);
@@ -1396,22 +2515,13 @@
     confirmDeleteBtn.addEventListener("click", async () => {
       if (!activeLogForDelete) return;
       const { uid, logId } = activeLogForDelete;
-      const row = logList.querySelector(`.log-item[data-log-id="${logId}"]`);
-      if (row) {
-        const group = row.closest(".log-group");
-        row.remove();
-        if (group && group.querySelectorAll(".log-item").length === 0) {
-          group.remove();
-        }
-        const cacheLogs = loadCache(uid, "logs") || [];
-        saveCache(uid, "logs", cacheLogs.filter((l) => l.id !== logId));
-        const remainingLogs = loadCache(uid, "logs") || [];
-        totalPaidEl.textContent = formatMoney(
-          remainingLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
-        );
-      } else {
-        await loadLogs(uid);
-      }
+      const cacheLogs = loadCache(uid, "logs") || [];
+      const remainingLogs = cacheLogs.filter((l) => l.id !== logId);
+      saveCache(uid, "logs", remainingLogs);
+      totalPaidEl.textContent = formatMoney(
+        remainingLogs.reduce((sum, log) => sum + (log.paid ? Number(log.amount) || 0 : 0), 0)
+      );
+      renderLogs(remainingLogs, loadCache(uid, "groups") || []);
       activeLogForDelete = null;
       deleteModal.classList.remove("show");
 
@@ -1476,9 +2586,11 @@
         if (tab.dataset.tab === "jobs") {
           jobsTab.classList.remove("hidden");
           logsTab.classList.add("hidden");
+          logsFilterRow.classList.add("hidden");
         } else {
           logsTab.classList.remove("hidden");
           jobsTab.classList.add("hidden");
+          logsFilterRow.classList.remove("hidden");
         }
       });
     });
@@ -1486,6 +2598,7 @@
     const hydrateFromCache = () => {
       const cachedUid = localStorage.getItem(lastUidKey);
       if (!cachedUid) return false;
+      currentClientFilter = loadSavedClientFilter(cachedUid);
       const cachedProfileRaw = localStorage.getItem(profileCacheKey(cachedUid));
       if (cachedProfileRaw) {
         try {
@@ -1513,6 +2626,7 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         localStorage.setItem(lastUidKey, user.uid);
+        currentClientFilter = loadSavedClientFilter(user.uid);
         const snap = await getDoc(profileDoc(user.uid));
         const data = snap.exists() ? snap.data() : {};
         userPill.textContent = data.displayName || user.email;
