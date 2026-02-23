@@ -297,39 +297,33 @@
       padding-left: 12px;
     }
 
-    .group-middle {
-      position: absolute;
-      left: 50%;
-      top: 12px;
-      transform: translateX(-50%);
-      max-width: 46%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-      pointer-events: none;
-    }
-
-    .group-title-row {
+    .logs-title-row {
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
+    .logs-toolbar-right {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     .sort-icon-btn {
-      border: 1px solid var(--border);
-      background: #fff;
+      border: none;
+      background: transparent;
       color: var(--muted);
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
+      padding: 0 2px;
+      border-radius: 0;
+      font-size: 1.35rem;
       line-height: 1;
       box-shadow: none;
     }
 
     .sort-icon-btn:hover {
       transform: none;
-      background: #f3f6fb;
+      background: transparent;
       color: var(--text);
     }
 
@@ -564,12 +558,6 @@
       color: var(--text);
     }
 
-    .log-client {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
     .muted { color: var(--muted); }
 
     .hidden { display: none; }
@@ -755,7 +743,10 @@
       <div id="logs-tab" class="card hidden">
         <div class="logs-toolbar">
           <h2>Log List</h2>
-          <button class="btn-primary" id="mark-paid">Paid</button>
+          <div class="logs-toolbar-right">
+            <button class="sort-icon-btn" type="button" data-open-sort="unpaid" title="Sort current logs" aria-label="Sort current unpaid logs">⇅</button>
+            <button class="btn-primary" id="mark-paid">Paid</button>
+          </div>
         </div>
         <div class="log-list" id="log-list"></div>
       </div>
@@ -1032,6 +1023,7 @@
     const sortDirectionSelect = document.getElementById("sort-direction");
     const cancelSortBtn = document.getElementById("cancel-sort");
     const saveSortBtn = document.getElementById("save-sort");
+    const sortToolbarBtn = document.querySelector('.logs-toolbar button[data-open-sort="unpaid"]');
 
     const tabs = document.querySelectorAll(".tab");
     const jobsTab = document.getElementById("jobs-tab");
@@ -1719,20 +1711,12 @@
         header.oncontextmenu = () => false;
         const total = groupLogs.reduce((sum, log) => sum + (Number(log.amount) || 0), 0);
         const rightText = showTotal ? `${groupLogs.length} items · ${formatMoney(total)}` : `${groupLogs.length} items`;
-        const primaryClient = normalizeClientName(groupLogs[0]?.clientName);
-        const hasSingleGroupClient = Boolean(primaryClient)
-          && groupLogs.every((log) => normalizeClientName(log.clientName) === primaryClient);
-        const showGroupClientInHeader = currentClientFilter === CLIENT_FILTER_ALL && hasSingleGroupClient;
-        const hideRowClientNames = currentClientFilter !== CLIENT_FILTER_ALL || showGroupClientInHeader;
-        const titleHtml = groupKey === "unpaid"
-          ? `<div class="group-title-row"><strong>${title}</strong><button class="sort-icon-btn" type="button" data-open-sort="unpaid" title="Sort current logs" aria-label="Sort current unpaid logs">⇅</button></div>`
-          : `<strong>${title}</strong>`;
+        const titleHtml = `<strong>${title}</strong>`;
         header.innerHTML = `
           <div class="group-left">
             ${titleHtml}
             ${subtitle ? `<div class="muted">${subtitle}</div>` : ""}
           </div>
-          ${showGroupClientInHeader ? `<div class="muted group-middle">${primaryClient}</div>` : ""}
           <div class="muted group-right">${rightText}</div>
         `;
         groupEl.appendChild(header);
@@ -1742,11 +1726,9 @@
           row.className = "log-item";
           row.dataset.logId = log.id;
           const createdAt = normalizeDate(log.createdAt);
-          const clientName = normalizeClientName(log.clientName);
           row.innerHTML = `
             <div>
               <strong>${log.jobName}</strong>
-              ${!hideRowClientNames && clientName ? `<div class="log-client">${clientName}</div>` : ""}
               <div class="date-button">${formatDate(createdAt)}</div>
             </div>
             <div><div class="amount-button">${formatMoney(log.amount)}</div></div>
@@ -2074,11 +2056,8 @@
       logEditModal.classList.add("show");
     };
 
-    logList.addEventListener("click", (e) => {
-      const sortButton = e.target.closest("button[data-open-sort]");
-      if (sortButton) {
-        openSortModal();
-      }
+    sortToolbarBtn?.addEventListener("click", () => {
+      openSortModal();
     });
 
     cancelSortBtn.addEventListener("click", () => {
